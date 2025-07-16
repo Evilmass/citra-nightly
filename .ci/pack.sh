@@ -25,13 +25,13 @@ if [ -z "${UPLOAD_RAW}" ]; then
     mkdir "$REV_NAME"
     mv build/bundle/* "$REV_NAME"
 
-    if [ "$OS" = "windows" ]; then
-        ARCHIVE_NAME="${REV_NAME}.zip"
-        powershell Compress-Archive "$REV_NAME" "$ARCHIVE_NAME"
-    else
-        ARCHIVE_NAME="${REV_NAME}.tar.gz"
-        tar czvf "$ARCHIVE_NAME" "$REV_NAME"
-    fi
+    # if [ "$OS" = "windows" ]; then
+    #     ARCHIVE_NAME="${REV_NAME}.zip"
+    #     powershell Compress-Archive "$REV_NAME" "$ARCHIVE_NAME"
+    # else
+    #     ARCHIVE_NAME="${REV_NAME}.tar.gz"
+    #     tar czvf "$ARCHIVE_NAME" "$REV_NAME"
+    # fi
 
     mv "$REV_NAME" $RELEASE_NAME
     7z a "$REV_NAME.7z" $RELEASE_NAME
