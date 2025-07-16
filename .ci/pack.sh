@@ -36,7 +36,7 @@ if [ -z "${UPLOAD_RAW}" ]; then
     mv "$REV_NAME" $RELEASE_NAME
     7z a "$REV_NAME.7z" $RELEASE_NAME
 
-    mv "$ARCHIVE_NAME" artifacts/
+    # mv "$ARCHIVE_NAME" artifacts/
     mv "$REV_NAME.7z" artifacts/
 else
     # Directly upload the raw artifacts, renamed with the revision.
