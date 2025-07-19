@@ -1,5 +1,5 @@
 # Build directory
-[Bb]uild/
+*_[Bb]uild/
 doc-build/
 
 # Generated source files

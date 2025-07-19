@@ -41,7 +41,7 @@ if (ARCHITECTURE_x86_64)
 endif()
 
 # libfmt
-add_subdirectory(fmt)
+#add_subdirectory(fmt)
 add_library(fmt::fmt ALIAS fmt)
 
 # getopt
@@ -69,7 +69,7 @@ add_subdirectory(open_source_archives)
 # SoundTouch
 add_subdirectory(soundtouch)
 # The SoundTouch target doesn't export the necessary include paths as properties by default
-target_include_directories(SoundTouch INTERFACE ./soundtouch/include)
+target_include_directories(SoundTouch INTERFACE /soundtouch/include)
 
 # Teakra
 add_subdirectory(teakra EXCLUDE_FROM_ALL)
@@ -78,7 +78,7 @@ add_subdirectory(teakra EXCLUDE_FROM_ALL)
 if (ARCHITECTURE_x86_64)
     # Defined before "dynarmic" above
     # add_library(xbyak INTERFACE)
-    target_include_directories(xbyak INTERFACE ./xbyak/xbyak)
+    target_include_directories(xbyak INTERFACE /xbyak/xbyak)
     target_compile_definitions(xbyak INTERFACE XBYAK_NO_OP_NAMES)
 endif()
 

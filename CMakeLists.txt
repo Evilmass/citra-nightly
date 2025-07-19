@@ -213,7 +213,9 @@ if (ENABLE_FFMPEG)
         find_package(FFmpeg REQUIRED COMPONENTS avcodec)
     endif()
     if ("${FFmpeg_avcodec_VERSION}" VERSION_LESS "57.48.101")
-        message(FATAL_ERROR "Found version for libavcodec is too low. The required version is at least 57.48.101 (included in FFmpeg 3.1 and later).")
+        #message(FATAL_ERROR "Found version for libavcodec is too low. The required version is at least 57.48.101 (included in FFmpeg 3.1 and later).")
+        set(FFMPEG_libavcodec_VERSION "61.19.101")
+        message(STATUS "Overriding FFmpeg version to: ${FFMPEG_libavcodec_VERSION}")
     endif()
 endif()
 
@@ -250,7 +252,7 @@ endif()
 # against all the src files. This should be used before making a pull request.
 # =======================================================================
 
-set(CLANG_FORMAT_POSTFIX "-6.0")
+set(CLANG_FORMAT_POSTFIX "-15")
 find_program(CLANG_FORMAT
     NAMES clang-format${CLANG_FORMAT_POSTFIX}
           clang-format
@@ -261,7 +263,7 @@ if (NOT CLANG_FORMAT)
         message(STATUS "Clang format not found! Downloading...")
         set(CLANG_FORMAT "${PROJECT_BINARY_DIR}/externals/clang-format${CLANG_FORMAT_POSTFIX}.exe")
         file(DOWNLOAD
-            https://github.com/yuzu-emu/ext-windows-bin/raw/master/clang-format${CLANG_FORMAT_POSTFIX}.exe
+            https://github.com/yuzu-mirror/ext-windows-bin/raw/master/clang-format${CLANG_FORMAT_POSTFIX}.exe
             "${CLANG_FORMAT}" SHOW_PROGRESS
             STATUS DOWNLOAD_SUCCESS)
         if (NOT DOWNLOAD_SUCCESS EQUAL 0)
