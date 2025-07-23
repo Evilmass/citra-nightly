@@ -6,7 +6,7 @@
     url = https://github.com/neobrain/nihstro.git
 [submodule "soundtouch"]
     path = externals/soundtouch
-    url = https://github.com/PabloMK7/ext-soundtouch.git
+    url = https://github.com/Evilmass/ext-soundtouch.git
 [submodule "catch"]
     path = externals/catch
     url = https://github.com/catchorg/Catch2.git
@@ -18,6 +18,9 @@
 [submodule "xbyak"]
     path = externals/xbyak
     url = https://github.com/herumi/xbyak.git
+[submodule "dynarmic"]
+    path = externals/dynarmic
+    url = https://github.com/ourfavoritefruits/dynarmic.git
 [submodule "cryptopp"]
     path = externals/cryptopp/cryptopp
     url = https://github.com/weidai11/cryptopp.git
