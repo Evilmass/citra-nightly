@@ -75,11 +75,15 @@ target_include_directories(SoundTouch INTERFACE ./soundtouch/include)
 add_subdirectory(teakra EXCLUDE_FROM_ALL)
 
 # Xbyak
-if (ARCHITECTURE_x86_64)
-    # Defined before "dynarmic" above
-    # add_library(xbyak INTERFACE)
-    target_include_directories(xbyak INTERFACE ./xbyak/xbyak)
-    target_compile_definitions(xbyak INTERFACE XBYAK_NO_OP_NAMES)
+if ("x86_64" IN_LIST ARCHITECTURE)
+    add_subdirectory(xbyak EXCLUDE_FROM_ALL)
+endif()
+
+# Dynarmic
+if ("x86_64" IN_LIST ARCHITECTURE OR "arm64" IN_LIST ARCHITECTURE)
+    set(DYNARMIC_TESTS OFF CACHE BOOL "")
+    set(DYNARMIC_FRONTENDS "A32" CACHE STRING "")
+    add_subdirectory(dynarmic EXCLUDE_FROM_ALL)
 endif()
 
 # Zstandard
