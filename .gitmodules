@@ -47,3 +47,6 @@
 [submodule "zstd"]
     path = externals/zstd
     url = https://github.com/facebook/zstd.git
+[submodule "externals/dynarmic"]
+	path = externals/dynarmic
+	url = https://github.com/Evilmass/dynarmic.git
