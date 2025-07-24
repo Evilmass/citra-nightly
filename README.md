@@ -1,7 +1,23 @@
 Revert 1543
-=============
+==============
 d11d600b61e44599a3b7379727263396e51b6ef4
 
+mscv build only
+==============
+```shell
+git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
+mkdir build && cd build
+cmake .. -Wno-dev -G "Visual Studio 15 2017 Win64" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_ USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=${COMPAT} -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+cd ..
+msbuild msvc_build/citra.sln /maxcpucount
+```
+
+AppVeyor
+==============
+https://ci.appveyor.com/project/Evilmass/citra-nightly
+
+Origin README
+==============
 **BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
 
 Citra
