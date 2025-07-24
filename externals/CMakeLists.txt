@@ -83,7 +83,7 @@ endif()
 if ("x86_64" IN_LIST ARCHITECTURE OR "arm64" IN_LIST ARCHITECTURE)
     set(DYNARMIC_TESTS OFF CACHE BOOL "")
     set(DYNARMIC_FRONTENDS "A32" CACHE STRING "")
-    add_subdirectory(dynarmic EXCLUDE_FROM_ALL)
+    #add_subdirectory(dynarmic EXCLUDE_FROM_ALL)
 endif()
 
 # Zstandard
