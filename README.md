@@ -6,10 +6,11 @@ mscv build only
 ==============
 ```shell
 git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
-mkdir build && cd build
+mkdir msvc_build && cd msvc_build
 cmake .. -Wno-dev -G "Visual Studio 15 2017 Win64" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=${COMPAT} -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 cd ..
-msbuild msvc_build/citra.sln /maxcpucount
+# msbuild msvc_build/citra.sln /?
+msbuild msvc_build/citra.sln /maxcpucount /p:Configuration=Release /p:Platform=x64 /t:Rebuild
 ```
 
 cherry-pick
@@ -17,11 +18,17 @@ cherry-pick
 [commit since=2020-05-11&until=2020-11-13](https://github.com/Evilmass/citra-nightly/commits/master?since=2020-05-11&until=2020-11-13&after=a061457cda396b8dd6a989f1f22987acee9e4441+139)
 
 [Avoid leaking the cubeb input stream](https://github.com/Evilmass/citra-nightly/commit/81a1e5680f93189d6029f579b4b261b2aa552818)
+
 [Actually save the input when clearing/resetting to default](https://github.com/Evilmass/citra-nightly/commit/8d19e144cb46c258107d90d77fb8258a945031d9)
+
 [Don't translate hotkey text](https://github.com/Evilmass/citra-nightly/commit/1d5d278f8d87acf2688b36e157c8b053e71cdd1f)
+
 [Minor frontend fixes to savestates (#5430)](https://github.com/Evilmass/citra-nightly/commit/6a77547bdee43ee67e3199354dd3de22f3b4a232)
+
 [Update translations (2020-07-01)](https://github.com/Evilmass/citra-nightly/commit/add0deb3c5399dbc2dc935cba70d1bf074c3a38f)
+
 [Merge pull request #5163 from z87/input-touch-mapping](https://github.com/Evilmass/citra-nightly/commit/81a1e5680f93189d6029f579b4b261b2aa552818)
+ -> `git cherry-pick 81a1e56 -m 1`
 
 AppVeyor
 ==============
