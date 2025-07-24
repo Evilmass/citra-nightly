@@ -30,18 +30,8 @@ target_include_directories(catch-single-include INTERFACE catch/single_include)
 # Crypto++
 add_subdirectory(cryptopp)
 
-# Dynarmic
-if (ARCHITECTURE_x86_64)
-    # Dynarmic will skip defining xbyak if it's already defined, we then define it below
-    add_library(xbyak INTERFACE)
-    option(DYNARMIC_TESTS OFF)
-    set(DYNARMIC_NO_BUNDLED_FMT ON)
-    set(DYNARMIC_FRONTENDS "A32")
-    add_subdirectory(dynarmic)
-endif()
-
 # libfmt
-add_subdirectory(fmt)
+add_subdirectory(fmt EXCLUDE_FROM_ALL)
 add_library(fmt::fmt ALIAS fmt)
 
 # getopt
@@ -83,7 +73,7 @@ endif()
 if ("x86_64" IN_LIST ARCHITECTURE OR "arm64" IN_LIST ARCHITECTURE)
     set(DYNARMIC_TESTS OFF CACHE BOOL "")
     set(DYNARMIC_FRONTENDS "A32" CACHE STRING "")
-    #add_subdirectory(dynarmic EXCLUDE_FROM_ALL)
+    add_subdirectory(dynarmic EXCLUDE_FROM_ALL)
 endif()
 
 # Zstandard
