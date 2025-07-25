@@ -48,6 +48,6 @@
     path = externals/zstd
     url = https://github.com/facebook/zstd.git
 [submodule "externals/dynarmic"]
-	path = externals/dynarmic
-	url = https://github.com/Evilmass/dynarmic.git
+    path = externals/dynarmic
+    url = https://github.com/Evilmass/dynarmic.git
     branch = 6.2.0

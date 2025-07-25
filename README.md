@@ -4,10 +4,15 @@ d11d600b61e44599a3b7379727263396e51b6ef4
 
 mscv build only
 ==============
+Visual Studio 2017 buildtools
+Winsdk(pdbstr.exe)
+Cmake
+Git
+
 ```shell
 git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
 mkdir msvc_build && cd msvc_build
-cmake .. -Wno-dev -G "Visual Studio 15 2017 Win64" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=${COMPAT} -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+cmake .. -Wno-dev --fresh -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=${COMPAT} -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 cd ..
 # msbuild msvc_build/citra.sln /?
 msbuild msvc_build/citra.sln /maxcpucount /p:Configuration=Release /p:Platform=x64 /t:Rebuild
@@ -29,6 +34,12 @@ cherry-pick
 
 [Merge pull request #5163 from z87/input-touch-mapping](https://github.com/Evilmass/citra-nightly/commit/81a1e5680f93189d6029f579b4b261b2aa552818)
  -> `git cherry-pick 81a1e56 -m 1`
+
+<!-- [citra_qt: Improvements to hotkeys and ui state management (#6224)](https://github.com/Evilmass/citra-nightly/commit/f66d03dd48ac81ce0cc0f1d0616d2f07093a59a3)
+ -> `Double-click on a binding to change it -> src\citra_qt\configuration\configure_hotkeys.ui -> commit history` -->
+
+<!--
+[Automatic Controller Binding (#5100)](https://github.com/Evilmass/citra-nightly/commit/ce16653cc81a1298a34741a7af4808da988a190f) -> `git log --all --regexp-ignore-case --grep="auto mapping"` -->
 
 AppVeyor
 ==============

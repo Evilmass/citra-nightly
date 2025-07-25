@@ -88,7 +88,7 @@ after_build:
           7z a -tzip $MSVC_BUILD_PDB $RELEASE_DIST\*.pdb
           rm $RELEASE_DIST\*.pdb
 
-          rm -f $RELEASE_DIST\tests.exe
+          rm $RELEASE_DIST\tests.exe
           mkdir -p $RELEASE_DIST\user
 
           7z a -tzip $MSVC_BUILD_ZIP $RELEASE_DIST\*
