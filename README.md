@@ -2,26 +2,6 @@ Revert 1543
 ==============
 d11d600b61e44599a3b7379727263396e51b6ef4
 
-mscv build only
-==============
-[Visual Studio 2017 Buildtools](https://aka.ms/vs/15/release/vs_community.exe)
-
-[Git](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
-
-[Cmake](https://github.com/Kitware/CMake/releases/download/v4.1.0-rc3/cmake-4.1.0-rc3-windows-x86_64.zip)
-
-[winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
-- only select `Debugging Tools For Windows` -> pdbstr.exe
-
-```shell
-git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
-mkdir msvc_build && cd msvc_build
-cmake .. -Wno-dev --fresh -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=${COMPAT} -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
-cd ..
-# msbuild msvc_build/citra.sln /?
-msbuild msvc_build/citra.sln /maxcpucount /p:Configuration=Release /p:Platform=x64 /t:Rebuild
-```
-
 cherry-pick
 ==============
 [commit since=2020-05-11&until=2020-11-13](https://github.com/Evilmass/citra-nightly/commits/master?since=2020-05-11&until=2020-11-13&after=a061457cda396b8dd6a989f1f22987acee9e4441+139)
@@ -45,9 +25,64 @@ cherry-pick
 <!--
 [Automatic Controller Binding (#5100)](https://github.com/Evilmass/citra-nightly/commit/ce16653cc81a1298a34741a7af4808da988a190f) -> `git log --all --regexp-ignore-case --grep="auto mapping"` -->
 
+
+mscv build only
+==============
+[Visual Studio 2017 Buildtools](https://aka.ms/vs/15/release/vs_community.exe)
+
+[winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
+- only select `Debugging Tools For Windows` -> pdbstr.exe
+
+[Git For Windows](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
+
+[Cmake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
+
+[7z](https://www.7-zip.org/a/7z2500-x64.exe)
+
+<!-- https://www.doxygen.nl/files/doxygen-1.14.0.windows.x64.bin.zip -->
+
+```shell
+# cmder -> bash
+git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
+
+# cmake
+mkdir msvc_build && cd msvc_build
+cmake .. --fresh -Wno-dev -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+## cmake again
+rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
+cmake .. -Wno-dev -G "Visual Studio 15 2017" -A x64 
+cd ..
+
+# build
+msbuild msvc_build/citra.sln /m:12 /p:Configuration=Release /p:Platform=x64 /t:Rebuild
+
+# pack
+RELEASE_DIST="head"
+GITDATE=$(git show -s --date=short --format='%ad')
+GITREV=$(git show -s --format='%h')
+MSVC_SEVENZIP="citra-windows-msvc-${GITDATE}-${GITREV}.7z"
+echo "output: $MSVC_SEVENZIP"
+
+mkdir -p "$RELEASE_DIST"
+cp -r ./msvc_build/bin/Release/* ./license.txt ./README.md "$RELEASE_DIST"
+rm -f "$RELEASE_DIST/tests.exe"
+mkdir -p "$RELEASE_DIST/user"
+7z a "$MSVC_SEVENZIP" "$RELEASE_DIST"
+```
+
+Translation
+==============
+Error: `Could not find a package configuration file provided by "Qt5LinguistTools"`
+```shell
+
+```
+
+## custom info
+CMakeModules\GenerateSCMRev.cmake -> -DBUILD_TAG=MHXX
+
 AppVeyor
 ==============
-https://ci.appveyor.com/project/Evilmass/citra-nightly
+[citra-nightly-AppVeyor](https://ci.appveyor.com/project/Evilmass/citra-nightly)
 
 Origin README
 ==============
