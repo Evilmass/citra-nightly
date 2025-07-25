@@ -42,32 +42,22 @@ mscv build only
 <!-- https://www.doxygen.nl/files/doxygen-1.14.0.windows.x64.bin.zip -->
 
 ```shell
-# cmder -> bash
+# git bash
 git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
 
 # cmake
 mkdir msvc_build && cd msvc_build
-cmake .. --fresh -Wno-dev -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
-## cmake again
-rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
-cmake .. -Wno-dev -G "Visual Studio 15 2017" -A x64 
+cmake .. -Wno-dev -G "Visual Studio 15 2017 Win64" -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 cd ..
 
+## 若你仅修改了源代码，而没有改变 CMakeLists.txt 文件，可以跳过 CMake 配置步骤，直接重新编译。
+rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
+
 # build
-msbuild msvc_build/citra.sln /m:12 /p:Configuration=Release /p:Platform=x64 /t:Rebuild
+msbuild msvc_build/citra.sln /p:Configuration=Release /p:Platform=x64 /t:Rebuild /m:8
 
 # pack
-RELEASE_DIST="head"
-GITDATE=$(git show -s --date=short --format='%ad')
-GITREV=$(git show -s --format='%h')
-MSVC_SEVENZIP="citra-windows-msvc-${GITDATE}-${GITREV}.7z"
-echo "output: $MSVC_SEVENZIP"
-
-mkdir -p "$RELEASE_DIST"
-cp -r ./msvc_build/bin/Release/* ./license.txt ./README.md "$RELEASE_DIST"
-rm -f "$RELEASE_DIST/tests.exe"
-mkdir -p "$RELEASE_DIST/user"
-7z a "$MSVC_SEVENZIP" "$RELEASE_DIST"
+bash pack.sh
 ```
 
 Translation
