@@ -1,3 +1,7 @@
+dev
+==============
+base [nightly1543](https://github.com/Evilmass/citra-nightly/d11d600b61e44599a3b7379727263396e51b6ef4)
+
 **BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
 
 Citra
