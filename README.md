@@ -72,9 +72,11 @@ mkdir -p "$RELEASE_DIST/user"
 
 Translation
 ==============
-Error: `Could not find a package configuration file provided by "Qt5LinguistTools"`
 ```shell
-
+# Error:
+Could not find a package configuration file provided by "Qt5LinguistTools"
+# Fix: add qttools
+aqt.exe install-qt --outputdir ./qt-5.10.0-msvc2017_64 windows desktop 5.10.0 win64_msvc2017_64 --archives qtbase qtm ultimedia qttools qttranslations
 ```
 
 ## custom info
