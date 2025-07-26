@@ -3331,13 +3331,13 @@ Refer to the log for details.</source>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2318"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1 </source>
+        <translation>%1 </translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2320"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1 | %2</source>
+        <translation>%1 | %2</translation>
     </message>
 </context>
 <context>
@@ -3529,7 +3529,7 @@ thiết lập tinh chỉnh hợp lý.</translation>
         <location filename="../../src/citra_qt/game_list_p.h" line="253"/>
         <source>Game functions, but with major graphical or audio glitches. Unable to progress in specific areas due to glitches
 even with workarounds.</source>
-        <translation>Game chạy được song với lỗi lớn về đồ họa hoặc âm thanh. Không thể chơi đến một tiến độ nhất định vì lỗi 
+        <translation>Game chạy được song với lỗi lớn về đồ họa hoặc âm thanh. Không thể chơi đến một tiến độ nhất định vì lỗi
 kể cả khi tinh chỉnh hay tìm cách tránh.</translation>
     </message>
     <message>

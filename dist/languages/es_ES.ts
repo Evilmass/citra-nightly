@@ -3333,13 +3333,13 @@ Compruebe el registro para más detalles.</translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2318"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1 </source>
+        <translation>%1 </translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2320"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1 | %2</source>
+        <translation>%1 | %2</translation>
     </message>
 </context>
 <context>
@@ -3520,7 +3520,7 @@ soluciones temporales.</translation>
         <location filename="../../src/citra_qt/game_list_p.h" line="252"/>
         <source>Game functions with major graphical or audio glitches, but game is playable from start to finish with
 workarounds.</source>
-        <translation>El juego funciona con importantes problemas gráficos o de sonido, pero el juego es jugable de principio a fin con 
+        <translation>El juego funciona con importantes problemas gráficos o de sonido, pero el juego es jugable de principio a fin con
 soluciones temporales.</translation>
     </message>
     <message>

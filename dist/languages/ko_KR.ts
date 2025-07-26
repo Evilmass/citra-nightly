@@ -3333,13 +3333,13 @@ Refer to the log for details.</source>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2318"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1 </source>
+        <translation>%1 </translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2320"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1 | %2</source>
+        <translation>%1 | %2</translation>
     </message>
 </context>
 <context>
@@ -3507,7 +3507,7 @@ any workarounds needed.</source>
         <location filename="../../src/citra_qt/game_list_p.h" line="251"/>
         <source>Game functions with minor graphical or audio glitches and is playable from start to finish. May require some
 workarounds.</source>
-        <translation>게임은 사소한 그래픽문제나 오디오 글리치와 함께 처음부터 끝까지 진행가능합니다. 
+        <translation>게임은 사소한 그래픽문제나 오디오 글리치와 함께 처음부터 끝까지 진행가능합니다.
 몇가지 해결방안이 필요할 수 있습니다.</translation>
     </message>
     <message>
@@ -3519,7 +3519,7 @@ workarounds.</source>
         <location filename="../../src/citra_qt/game_list_p.h" line="252"/>
         <source>Game functions with major graphical or audio glitches, but game is playable from start to finish with
 workarounds.</source>
-        <translation>게임은 주요 그래픽문제나 오디오 글리치와 함께 처음부터 끝까지 진행가능합니다. 
+        <translation>게임은 주요 그래픽문제나 오디오 글리치와 함께 처음부터 끝까지 진행가능합니다.
 몇가지 해결방안이 필요할 수 있습니다.</translation>
     </message>
     <message>
@@ -3531,7 +3531,7 @@ workarounds.</source>
         <location filename="../../src/citra_qt/game_list_p.h" line="253"/>
         <source>Game functions, but with major graphical or audio glitches. Unable to progress in specific areas due to glitches
 even with workarounds.</source>
-        <translation>게임은 작동하지만 주요 그래픽이나 오디오 글리치가 있습니다. 특별한 해결방안에도 불구하고 
+        <translation>게임은 작동하지만 주요 그래픽이나 오디오 글리치가 있습니다. 특별한 해결방안에도 불구하고
 특정한 지역에서 글리치로 인해 진행이 불가능합니다</translation>
     </message>
     <message>
@@ -3543,7 +3543,7 @@ even with workarounds.</source>
         <location filename="../../src/citra_qt/game_list_p.h" line="254"/>
         <source>Game is completely unplayable due to major graphical or audio glitches. Unable to progress past the Start
 Screen.</source>
-        <translation>주요 그래픽 또는 오디오 결함으로 인해 게임을 완전히 재생할 수 없습니다. 시작화면을 
+        <translation>주요 그래픽 또는 오디오 결함으로 인해 게임을 완전히 재생할 수 없습니다. 시작화면을
 지날 수 없습니다</translation>
     </message>
     <message>

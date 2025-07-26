@@ -340,7 +340,7 @@ Bu onun hem forum kullanıcı adını hemde IP adresini yasaklar.</translation>
         <location filename="../../src/citra_qt/cheats.cpp" line="101"/>
         <source>Cheat code line %1 is not valid.
 Would you like to ignore the error and continue?</source>
-        <translation>Hile kodu %1. satır geçerli değil. 
+        <translation>Hile kodu %1. satır geçerli değil.
 Hatayı yoksay ve devam et?</translation>
     </message>
     <message>
@@ -3332,13 +3332,13 @@ Refer to the log for details.</source>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2318"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1 </source>
+        <translation>%1 </translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2320"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1 | %2</source>
+        <translation>%1 | %2</translation>
     </message>
 </context>
 <context>

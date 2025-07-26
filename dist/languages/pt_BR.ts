@@ -3334,13 +3334,13 @@ Consulte o log para ver detalhes.</translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2318"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1 </source>
+        <translation>%1 </translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2320"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1 | %2</source>
+        <translation>%1 | %2</translation>
     </message>
 </context>
 <context>
