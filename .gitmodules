@@ -51,3 +51,6 @@
 [submodule "zstd"]
     path = externals/zstd
     url = https://github.com/facebook/zstd.git
+[submodule "dist/compatibility_list"]
+	path = dist/compatibility_list
+	url = https://github.com/Evilmass/compatibility-list
