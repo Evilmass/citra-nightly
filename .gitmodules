@@ -51,3 +51,6 @@
     path = externals/dynarmic
     url = https://github.com/Evilmass/dynarmic.git
     branch = 6.2.0
+[submodule "dist/compatibility_list"]
+	path = dist/compatibility_list
+	url = https://github.com/Evilmass/compatibility-list
