@@ -30,9 +30,8 @@ cmake --version
 gcc -v
 tx --version
 
-cd /citra
 mkdir build && cd build
-cmake .. -Wno-dev -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_QT_TRANSLATION=ON -DGENERATE_QT_TRANSLATION=ON -DCMAKE_BUILD_TYPE=Release -DENABLE_SDL2=OFF
+cmake .. -DENABLE_QT_TRANSLATION=ON -DGENERATE_QT_TRANSLATION=ON -DCMAKE_BUILD_TYPE=Release -DENABLE_SDL2=OFF
 make translation
 cd ..
 
