@@ -29,18 +29,19 @@ jobs:
           key: ${{ runner.os }}-win-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-win-
-      - name: Set up MSVC
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.arch }}
-          sdk: ${{ matrix.sdk }}
-          toolset: ${{ matrix.toolset }}
-          vsversion: ${{ matrix.vsversion }}
-      # - name: Add msbuild to PATH
-      #   uses: microsoft/setup-msbuild@v2
+      # - name: Set up MSVC
+      #   uses: ilammy/msvc-dev-cmd@v1
       #   with:
-      #     vs-version: '[15.0,15.1)'
-      #     msbuild-architecture: x64
+      #     arch: ${{ matrix.arch }}
+      #     sdk: ${{ matrix.sdk }}
+      #     toolset: ${{ matrix.toolset }}
+      #     vsversion: ${{ matrix.vsversion }}
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+          sdk: 10.0.19041.0
+          vs-version: '[15.0,15.1)'
+          msbuild-architecture: x64
       - name: Build
         run: ./.ci/windows-msvc/build.sh
         shell: bash
