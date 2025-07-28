@@ -2,6 +2,7 @@
 
 mkdir build && cd build
 cmake .. -Wno-dev -G "Visual Studio 17 2022" -A x64 \
+    -DCMAKE_TOOLCHAIN_FILE="$(pwd)/../CMakeModules/MSVCCache.cmake" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
