@@ -39,7 +39,7 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
         with:
-          # vs-version: '[15.0,15.10)'
+          vs-version: '15.0'
           msbuild-architecture: x64
       - name: Build
         run: ./.ci/windows-msvc/build.sh
