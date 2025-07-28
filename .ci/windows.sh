@@ -1,8 +1,7 @@
 #!/bin/sh -ex
 
 mkdir build && cd build
-cmake .. -Wno-dev -G "Visual Studio 17 2022" -A x64 \
-    -DCMAKE_TOOLCHAIN_FILE="$(pwd)/../CMakeModules/MSVCCache.cmake" \
+cmake .. -G "Visual Studio 17 2022" -A x64 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCITRA_USE_BUNDLED_QT=1 \
     -DCITRA_USE_BUNDLED_SDL2=1 \
