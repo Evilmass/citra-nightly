@@ -171,13 +171,7 @@ public:
         BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
 
-    // currently Service::HID::pad_update_ticks is the smallest interval for an event that gets
-    // always scheduled. Therfore we use this as orientation for the MAX_SLICE_LENGTH
-    // For performance bigger slice length are desired, though this will lead to cores desync
-    // But we never want to schedule events into the current slice, because then cores might to
-    // run small slices to sync up again. This is especially important for events that are always
-    // scheduled and repated.
-    static constexpr int MAX_SLICE_LENGTH = BASE_CLOCK_RATE_ARM11 / 234;
+    static constexpr int MAX_SLICE_LENGTH = 20000;
 
     class Timer {
     public:
@@ -186,9 +180,7 @@ public:
 
         s64 GetMaxSliceLength() const;
 
-        void Advance();
-
-        void SetNextSlice(s64 max_slice_length = MAX_SLICE_LENGTH);
+        void Advance(s64 max_slice_length = MAX_SLICE_LENGTH);
 
         void Idle();
 
@@ -235,9 +227,6 @@ public:
         void serialize(Archive& ar, const unsigned int) {
             MoveEvents();
             // NOTE: ts_queue should be empty now
-            // TODO(SaveState): Remove the next two lines when we break compatibility
-            s64 x;
-            ar& x; // to keep compatibility with old save states that stored global_timer
             ar& event_queue;
             ar& event_fifo_id;
             ar& slice_length;
@@ -271,6 +260,10 @@ public:
 
     s64 GetGlobalTicks() const;
 
+    void AddToGlobalTicks(s64 ticks) {
+        global_timer += ticks;
+    }
+
     /**
      * Updates the value of the cpu clock scaling to the new percentage.
      */
@@ -281,6 +274,8 @@ public:
     std::shared_ptr<Timer> GetTimer(std::size_t cpu_id);
 
 private:
+    s64 global_timer = 0;
+
     // unordered_map stores each element separately as a linked list node so pointers to
     // elements remain stable regardless of rehashes/resizing.
     std::unordered_map<std::string, TimingEventType> event_types = {};
@@ -295,6 +290,7 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int file_version) {
         // event_types set during initialization of other things
+        ar& global_timer;
         ar& timers;
         if (file_version == 0) {
             std::shared_ptr<Timer> x;
