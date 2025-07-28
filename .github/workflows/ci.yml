@@ -40,9 +40,14 @@ jobs:
         uses: microsoft/setup-msbuild@v2
         with:
           msbuild-architecture: x64
+      - name: Check MSBuild installation
+        run: |
+          Get-Command msbuild -ErrorAction SilentlyContinue
+          echo $env:PATH
+        shell: pwsh
       - name: Build
         run: ./.ci/windows-msvc/build.sh
-        shell: bash
+        shell: pwsh
   transifex:
     runs-on: ubuntu-latest
     container: citraemu/build-environments:linux-transifex
