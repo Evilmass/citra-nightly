@@ -14,7 +14,9 @@ jobs:
         with:
           submodules: recursive
       - name: Pack
-        run: ./.ci/source.sh
+        run: |
+          chmod +x ./.ci/source.sh
+          ./.ci/source.sh
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
