@@ -36,10 +36,14 @@ jobs:
       #     sdk: ${{ matrix.sdk }}
       #     toolset: ${{ matrix.toolset }}
       #     vsversion: ${{ matrix.vsversion }}
+      - name: Install Visual Studio 2017
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          toolset: 15.0  # VS2017
+          arch: x64
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
         with:
-          vs-version: '15.0'
           msbuild-architecture: x64
       - name: Build
         run: ./.ci/windows-msvc/build.sh
