@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   windows:
-    runs-on: windows-2022
+    runs-on: windows-2019
     strategy:
       matrix:
         arch:
@@ -15,9 +15,9 @@ jobs:
         sdk:
           - 10.0.19041.0
         toolset:
-          - 14.16.27023
-        # vsversion:
-        #   - 2019
+          - 19.16.27023
+        vsversion:
+          - '[15.0,16.0)'
     steps:
       - uses: actions/checkout@v4
         with:
