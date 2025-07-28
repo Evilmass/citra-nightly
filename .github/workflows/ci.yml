@@ -17,7 +17,7 @@ jobs:
         toolset:
           - 19.16.27023
         vsversion:
-          - '[15.0,16.0)'
+          - '2022'
     steps:
       - uses: actions/checkout@v4
         with:
