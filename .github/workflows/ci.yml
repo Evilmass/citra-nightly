@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     strategy:
       matrix:
         arch:
@@ -31,7 +31,7 @@ jobs:
         run: ./.ci/windows-msvc/deps.sh
         shell: bash
       - name: Set up MSVC
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@v1.13.0
         with:
           arch: ${{ matrix.arch }}
           toolset: ${{ matrix.toolset }}
