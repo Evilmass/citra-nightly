@@ -6,6 +6,30 @@ on:
     tags: [ "*" ]
   workflow_dispatch:
 jobs:
+  source:
+    if: ${{ !github.head_ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Pack
+        run: ./.ci/source.sh
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: source
+          path: artifacts/
+  transifex:
+    runs-on: ubuntu-latest
+    container: citraemu/build-environments:linux-transifex
+    if: ${{ github.repository == 'citra-emu/citra' && !github.head_ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Translation
+        run: ./.ci/transifex.sh
+        env:
+          TRANSIFEX_API_TOKEN: ${{ secrets.TRANSIFEX_API_TOKEN }}
   windows:
     runs-on: windows-2022
     strategy:
@@ -39,32 +63,63 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
         with:
-          msbuild-architecture: x64
-      - name: Check MSBuild installation
-        run: |
-          Get-Command msbuild -ErrorAction SilentlyContinue
-          echo $env:PATH
-        shell: pwsh
+          msbuild-architecture: ${{ matrix.arch }}
+      - name: Disable line ending translation
+        run: git config --global core.autocrlf input
       - name: Build
-        run: |
-          mkdir build && cd build
-          cmake .. -G "Visual Studio 17 2022" -A x64 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
-          cd ..
-          msbuild build/citra.sln -t:rebuild -verbosity:diag -property:Configuration=Release -property:Platform=x64
-          ctest -VV -C Release || echo "::error ::Test error occurred on Windows MSVC build"
-  transifex:
-    runs-on: ubuntu-latest
-    container: citraemu/build-environments:linux-transifex
-    if: ${{ github.repository == 'citra-emu/citra' && !github.head_ref }}
+        run: ./.ci/windows.sh
+      - name: Pack
+        run: ./.ci/pack.sh
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.OS }}-${{ env.TARGET }}
+          path: artifacts/
+  windows-ninja:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        target: ["msvc", "msys2"]
+    defaults:
+      run:
+        shell: ${{ (matrix.target == 'msys2' && 'msys2') || 'bash' }} {0}
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_COMPILERCHECK: content
+      CCACHE_SLOPPINESS: time_macros
+      OS: windows
+      TARGET: ${{ matrix.target }}
     steps:
       - uses: actions/checkout@v4
-      - name: Update Translation
-        run: ./.ci/transifex/docker.sh
-        env:
-          TRANSIFEX_API_TOKEN: ${{ secrets.TRANSIFEX_API_TOKEN }}
+        with:
+          submodules: recursive
+      - name: Set up cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.target }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.target }}-
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ matrix.target == 'msvc' }}
+      - name: Install extra tools (MSVC)
+        run: choco install ccache ninja wget
+        if: ${{ matrix.target == 'msvc' }}
+      - name: Disable line ending translation
+        run: git config --global core.autocrlf input
+      - name: Build
+        run: ./.ci/windows-ninja.sh
+      - name: Pack
+        run: ./.ci/pack.sh
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.OS }}-${{ env.TARGET }}
+          path: artifacts/
   release:
     runs-on: ubuntu-latest
-    needs: [windows]
+    needs: [source,windows,windows-ninja]
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
     steps:
       - uses: actions/download-artifact@v4
