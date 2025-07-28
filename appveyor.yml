@@ -1,3 +1,5 @@
+skip_non_tags: false
+
 # shallow clone
 clone_depth: 10
 
@@ -28,9 +30,8 @@ before_build:
   - mkdir %BUILD_TYPE%_build
   - cd %BUILD_TYPE%_build
   - ps: |
-        $COMPAT = if ($env:ENABLE_COMPATIBILITY_REPORTING -eq $null) {0} else {$env:ENABLE_COMPATIBILITY_REPORTING}
         # redirect stderr and change the exit code to prevent powershell from cancelling the build if cmake prints a warning
-        cmd /C 'cmake .. -G "Visual Studio 15 2017 Win64" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=${COMPAT} -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=ON -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON 2>&1 && exit 0'
+        cmd /C 'cmake .. -G "Visual Studio 15 2017 Win64" -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON 2>&1 && exit 0'
   - cd ..
 
 build_script:
@@ -50,7 +51,7 @@ after_build:
         $MSVC_SEVENZIP = "citra-windows-msvc-$GITDATE-$GITREV.7z" -replace " ", ""
 
         # set the build names as env vars so the artifacts can upload them
-        $env:BUILD_UPDATE = $MSVC_SEVENZIP
+        $env:BUILD_ARTIFACT = $MSVC_SEVENZIP
 
         # pack
         mkdir -p $RELEASE_DIST/user
@@ -66,12 +67,26 @@ test_script:
   - cd ..
 
 artifacts:
-  - path: $(BUILD_UPDATE)
-    name: update
+  - path: $(BUILD_ARTIFACT)
+    name: build
 
 notifications:
-  - provider: Webhook
-    url: {appveyor.webhook_url}
+  - provider: Email
+    to:
+      - jjk7bdlJbyYQvQdmYVafmmJdJqlYxJJkHNvtEDPDYUE=
     on_build_success: true
     on_build_failure: true
-    message: '构建 {{status}} - 项目: {{projectName}}, 版本: {{buildVersion}}, 提交: {{commitId}}'
+
+## 改为手动发布正式版 Release，避免重复触发 tag 构建
+# deploy:
+#   - provider: GitHub
+#     release: "Release v$(APPVEYOR_BUILD_VERSION)"
+#     description: "Auto-generated release from AppVeyor"
+#     auth_token:
+#       secure: yQNqsqXgEKlK6FTKaiYSoz34S5UAeo/UbGo0/DoE2zi/aujXC1M6i88xvXaRADJe
+#     artifact: $(BUILD_ARTIFACT)
+#     draft: false
+#     prerelease: false
+#     on:
+#       APPVEYOR_REPO_TAG: true  # 仅当打 tag 时触发发布
+
