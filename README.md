@@ -54,7 +54,7 @@ cd ..
 rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
 
 # build
-msbuild msvc_build/citra.sln /p:Configuration=Release /m /p:Platform=x64 /t:Rebuild
+msbuild msvc_build/citra.sln -t:rebuild -verbosity:diag -property:Configuration=Release -property:Platform=x64
 
 # pack
 bash pack.sh

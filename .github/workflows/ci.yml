@@ -27,15 +27,17 @@ jobs:
           key: ${{ runner.os }}-win-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-win-
-      - name: Install dependencies
-        run: ./.ci/windows-msvc/deps.sh
-        shell: bash
-      - name: Set up MSVC
-        uses: ilammy/msvc-dev-cmd@v1.13.0
+      # - name: Set up MSVC
+      #   uses: ilammy/msvc-dev-cmd@v1.13.0
+      #   with:
+      #     arch: ${{ matrix.arch }}
+      #     toolset: ${{ matrix.toolset }}
+      #     vsversion: ${{ matrix.vsversion }}
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
         with:
-          arch: ${{ matrix.arch }}
-          toolset: ${{ matrix.toolset }}
-          vsversion: ${{ matrix.vsversion }}
+          vs-version: '[15.0,15.1)'
+          msbuild-architecture: x64
       - name: Build
         run: ./.ci/windows-msvc/build.sh
         shell: bash
