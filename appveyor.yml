@@ -1,0 +1,92 @@
+skip_non_tags: false
+
+# shallow clone
+clone_depth: 10
+
+cache:
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+
+os: Visual Studio 2017
+
+environment:
+  # Tell msys2 to add mingw64 to the path
+  MSYSTEM: MINGW64
+  # Tell msys2 to inherit the current directory when starting the shell
+  CHERE_INVOKING: 1
+  matrix:
+    - BUILD_TYPE: msvc
+
+platform:
+  - x64
+
+configuration:
+  - Release
+
+install:
+  - git submodule update --init --recursive
+
+before_build:
+  - mkdir %BUILD_TYPE%_build
+  - cd %BUILD_TYPE%_build
+  - ps: |
+        # redirect stderr and change the exit code to prevent powershell from cancelling the build if cmake prints a warning
+        cmd /C 'cmake .. -G "Visual Studio 15 2017 Win64" -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON 2>&1 && exit 0'
+  - cd ..
+
+build_script:
+  - ps: |
+        # https://www.appveyor.com/docs/build-phase
+        msbuild msvc_build/citra.sln /maxcpucount /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+after_build:
+  - ps: |
+        $GITDATE = $(git show -s --date=short --format='%ad') -replace "-",""
+        $GITREV = $(git show -s --format='%h')
+
+        # There is no repo tag - make assumptions
+        $RELEASE_DIST = "head"
+
+        # Where are these spaces coming from? Regardless, let's remove them
+        $MSVC_SEVENZIP = "citra-windows-msvc-$GITDATE-$GITREV.7z" -replace " ", ""
+
+        # set the build names as env vars so the artifacts can upload them
+        $env:BUILD_ARTIFACT = $MSVC_SEVENZIP
+
+        # pack
+        mkdir -p $RELEASE_DIST/user
+        Copy-Item .\msvc_build\bin\release\* -Destination $RELEASE_DIST -Recurse -Exclude *.pdb, tests.exe
+        Copy-Item .\license.txt -Destination $RELEASE_DIST
+        Copy-Item .\README.md -Destination $RELEASE_DIST
+        7z a $MSVC_SEVENZIP $RELEASE_DIST
+
+test_script:
+  - cd %BUILD_TYPE%_build
+  - ps: |
+        ctest -VV -C Release
+  - cd ..
+
+artifacts:
+  - path: $(BUILD_ARTIFACT)
+    name: build
+
+notifications:
+  - provider: Email
+    to:
+      - jjk7bdlJbyYQvQdmYVafmmJdJqlYxJJkHNvtEDPDYUE=
+    on_build_success: true
+    on_build_failure: true
+
+## 改为手动发布正式版 Release，避免重复触发 tag 构建
+# deploy:
+#   - provider: GitHub
+#     release: "Release v$(APPVEYOR_BUILD_VERSION)"
+#     description: "Auto-generated release from AppVeyor"
+#     auth_token:
+#       secure: yQNqsqXgEKlK6FTKaiYSoz34S5UAeo/UbGo0/DoE2zi/aujXC1M6i88xvXaRADJe
+#     artifact: $(BUILD_ARTIFACT)
+#     draft: false
+#     prerelease: false
+#     on:
+#       APPVEYOR_REPO_TAG: true  # 仅当打 tag 时触发发布
+

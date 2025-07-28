@@ -18,8 +18,8 @@ get_timestamp(BUILD_DATE)
 
 # Generate cpp with Git revision from template
 # Also if this is a CI build, add the build name (ie: Nightly, Canary) to the scm_rev file as well
-set(REPO_NAME "")
-set(BUILD_VERSION "0")
+set(REPO_NAME "citra-mhxx")
+set(BUILD_VERSION "v2.0.0")
 if (DEFINED ENV{CI})
   if (DEFINED ENV{GITHUB_ACTIONS})
     set(BUILD_REPOSITORY $ENV{GITHUB_REPOSITORY})
@@ -58,6 +58,7 @@ if (DEFINED ENV{CI})
     endif()
   endif()
 endif()
+set(BUILD_FULLNAME "${REPO_NAME} ${BUILD_VERSION} ")
 
 # The variable SRC_DIR must be passed into the script (since it uses the current build directory for all values of CMAKE_*_DIR)
 set(VIDEO_CORE "${SRC_DIR}/src/video_core")

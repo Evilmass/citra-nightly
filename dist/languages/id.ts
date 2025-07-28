@@ -3474,13 +3474,13 @@ Refer to the log for details.</source>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2365"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1</source>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2367"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1| %2</source>
+        <translation>%1| %2</translation>
     </message>
 </context>
 <context>
@@ -3649,7 +3649,7 @@ ada lagi perbaikan yang di butuhkan.</translation>
         <location filename="../../src/citra_qt/game_list_p.h" line="252"/>
         <source>Game functions with minor graphical or audio glitches and is playable from start to finish. May require some
 workarounds.</source>
-        <translation>Fungsi Game dengan kerusakan gambar atau audio yang kecil dan dapat di mainkan dari awal sampai selesai.Mungkin membutuhkan beberapa 
+        <translation>Fungsi Game dengan kerusakan gambar atau audio yang kecil dan dapat di mainkan dari awal sampai selesai.Mungkin membutuhkan beberapa
 perbaikan.</translation>
     </message>
     <message>
@@ -3661,7 +3661,7 @@ perbaikan.</translation>
         <location filename="../../src/citra_qt/game_list_p.h" line="253"/>
         <source>Game functions with major graphical or audio glitches, but game is playable from start to finish with
 workarounds.</source>
-        <translation>Fungsi Game dengan kerusakan gambar atau audio yang besar,tetapi game-nya dapat di mainkan dari awal sampai akhir dengan berbagai macam 
+        <translation>Fungsi Game dengan kerusakan gambar atau audio yang besar,tetapi game-nya dapat di mainkan dari awal sampai akhir dengan berbagai macam
 perbaikan.</translation>
     </message>
     <message>
@@ -3673,7 +3673,7 @@ perbaikan.</translation>
         <location filename="../../src/citra_qt/game_list_p.h" line="254"/>
         <source>Game functions, but with major graphical or audio glitches. Unable to progress in specific areas due to glitches
 even with workarounds.</source>
-        <translation> Fungsi Game,tetapi dengan kerusakan gambar atau audio yang besar.Tidak bisa berlanjut memasuki ke dalam area tertentu do karenakan kerusakannya tersebut 
+        <translation> Fungsi Game,tetapi dengan kerusakan gambar atau audio yang besar.Tidak bisa berlanjut memasuki ke dalam area tertentu do karenakan kerusakannya tersebut
 bahkan dengan berbagai macam perbaikan</translation>
     </message>
     <message>
@@ -3685,7 +3685,7 @@ bahkan dengan berbagai macam perbaikan</translation>
         <location filename="../../src/citra_qt/game_list_p.h" line="255"/>
         <source>Game is completely unplayable due to major graphical or audio glitches. Unable to progress past the Start
 Screen.</source>
-        <translation>Game secara total tidak dapat di mainkan di karenakan kerusakan gambar atau audio yang besar.Tidak bisa berlanjut hingga melewati Layar 
+        <translation>Game secara total tidak dapat di mainkan di karenakan kerusakan gambar atau audio yang besar.Tidak bisa berlanjut hingga melewati Layar
 Mulai.</translation>
     </message>
     <message>
