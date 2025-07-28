@@ -3470,13 +3470,13 @@ Refer to the log for details.</source>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2365"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1</source>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2367"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1| %2</source>
+        <translation>%1| %2</translation>
     </message>
 </context>
 <context>

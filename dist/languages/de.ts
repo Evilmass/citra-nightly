@@ -3475,13 +3475,13 @@ Sieh dir den Log für Details an.</translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2365"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1</source>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2367"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1| %2</source>
+        <translation>%1| %2</translation>
     </message>
 </context>
 <context>
@@ -3649,7 +3649,7 @@ any workarounds needed.</source>
         <location filename="../../src/citra_qt/game_list_p.h" line="252"/>
         <source>Game functions with minor graphical or audio glitches and is playable from start to finish. May require some
 workarounds.</source>
-        <translation>Das Spiel funktioniert mit kleineren Grafik- und Audiofehlern und lässt sich bis zum Ende durchspielen. 
+        <translation>Das Spiel funktioniert mit kleineren Grafik- und Audiofehlern und lässt sich bis zum Ende durchspielen.
 Eventuell sind einige Workarounds notwendig.</translation>
     </message>
     <message>

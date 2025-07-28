@@ -3473,13 +3473,13 @@ Refer to the log for details.</source>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2365"/>
-        <source>Citra %1</source>
-        <translation>Citra %1</translation>
+        <source>%1</source>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../../src/citra_qt/main.cpp" line="2367"/>
-        <source>Citra %1| %2</source>
-        <translation>Citra %1| %2</translation>
+        <source>%1| %2</source>
+        <translation>%1| %2</translation>
     </message>
 </context>
 <context>
@@ -3658,7 +3658,7 @@ workarounds.</source>
         <location filename="../../src/citra_qt/game_list_p.h" line="253"/>
         <source>Game functions with major graphical or audio glitches, but game is playable from start to finish with
 workarounds.</source>
-        <translation>Het spel functioneert met enorme grafische of geluidsproblemen, maar het spel is speelbaar van het begin tot het einde met 
+        <translation>Het spel functioneert met enorme grafische of geluidsproblemen, maar het spel is speelbaar van het begin tot het einde met
 omzeilingen.</translation>
     </message>
     <message>
