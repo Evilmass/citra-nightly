@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
 jobs:
   windows:
-    runs-on: windows-2022
+    runs-on: windows-latest
     strategy:
       matrix:
         arch:
-          - amd64
+          - x64
         toolset:
           - 14.16
         vsversion:
@@ -27,17 +27,17 @@ jobs:
           key: ${{ runner.os }}-win-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-win-
-      # - name: Set up MSVC
-      #   uses: ilammy/msvc-dev-cmd@v1.13.0
-      #   with:
-      #     arch: ${{ matrix.arch }}
-      #     toolset: ${{ matrix.toolset }}
-      #     vsversion: ${{ matrix.vsversion }}
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
         with:
-          vs-version: '[15.0,15.1)'
-          msbuild-architecture: x64
+          arch: ${{ matrix.arch }}
+          toolset: ${{ matrix.toolset }}
+          # vsversion: ${{ matrix.vsversion }}
+      # - name: Add msbuild to PATH
+      #   uses: microsoft/setup-msbuild@v2
+      #   with:
+      #     vs-version: '[15.0,15.1)'
+      #     msbuild-architecture: x64
       - name: Build
         run: ./.ci/windows-msvc/build.sh
         shell: bash
