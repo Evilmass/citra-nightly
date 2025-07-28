@@ -26,7 +26,7 @@ jobs:
       matrix:
         target: ["appimage", "fresh"]
     container:
-      image: azahar-emu/build-environments:linux-${{ matrix.target }}
+      image: azahar-emu/build-environment:linux-${{ matrix.target }}
       options: -u 1001
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
