@@ -15,7 +15,7 @@ jobs:
         toolset:
           - 14.16
         vsversion:
-          - 17.0
+          - 2019
     steps:
       - uses: actions/checkout@v4
         with:

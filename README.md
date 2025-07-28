@@ -28,7 +28,7 @@ cherry-pick
 
 mscv build only
 ==============
-[Visual Studio 2017 Buildtools](https://aka.ms/vs/15/release/vs_community.exe)
+[Visual Studio 2017 Buildtools](https://aka.ms/vs/15/release/vs_buildtools.exe)
 
 [winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
 - only select `Debugging Tools For Windows` -> pdbstr.exe
