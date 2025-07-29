@@ -1,7 +1,8 @@
 #!/bin/sh -ex
 
 mkdir build && cd build
-cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 \
+# cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 \
+cmake .. -G "Visual Studio 15 2017 Win64" -A x64 \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCITRA_USE_BUNDLED_QT=1 \

@@ -47,6 +47,8 @@ jobs:
             ${{ runner.os }}-win-
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: 2017
         # with:
         #   arch: ${{ matrix.arch }}
         #   sdk: ${{ matrix.sdk }}
