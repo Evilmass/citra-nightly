@@ -4,8 +4,8 @@ mkdir build && cd build
 # cmake .. -G "Visual Studio 15 2017 Win64" -A x64 \
 cmake .. -G "Visual Studio 17 2022" -A x64 \
     -DCMAKE_SYSTEM_VERSION=10.0.19041.0 \
-    -DCMAKE_C_COMPILER="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\cl.exe" \
-    -DCMAKE_CXX_COMPILER="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\cl.exe" \
+    -DCMAKE_C_COMPILER="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\cl.exe" \
+    -DCMAKE_CXX_COMPILER="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\cl.exe" \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCITRA_USE_BUNDLED_QT=1 \
