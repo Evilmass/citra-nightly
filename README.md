@@ -24,25 +24,20 @@ cherry-pick
 [Automatic Controller Binding (#5100)](https://github.com/Evilmass/citra-nightly/commit/ce16653cc81a1298a34741a7af4808da988a190f) -> `git log --all --regexp-ignore-case --grep="auto mapping"` -->
 
 
-mscv build only
+mscv build
 ==============
-[Visual Studio 2017 BuildTools](https://aka.ms/vs/15/release/vs_buildtools.exe)
-[Visual Studio 2012 BuildTools](https://aka.ms/vs/15/release/vs_buildtools.exe)
-
-[winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
-- only select `Debugging Tools For Windows` -> pdbstr.exe
-
+<!-- [Visual Studio 2017 BuildTools](https://aka.ms/vs/15/release/vs_buildtools.exe) -->
+[Visual Studio 2022 BuildTools](https://aka.ms/vs/17/release/vs_buildtools.exe)
+<!-- [winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
+- only select `Debugging Tools For Windows` -> pdbstr.exe -->
 [Git For Windows](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
-
 [Cmake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
-
 [7z](https://www.7-zip.org/a/7z2500-x64.exe)
-
 <!-- https://www.doxygen.nl/files/doxygen-1.14.0.windows.x64.bin.zip -->
 
 ```shell
 # git bash
-git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
+git clone -b dev --recursive https://github.com/Evilmass/citra-nightly.git
 
 # cmake
 mkdir msvc_build && cd msvc_build
@@ -56,7 +51,7 @@ cd ..
 
 # build
 "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
-msbuild msvc_build/citra.sln -t:rebuild -verbosity:diag -property:Configuration=Release -property:Platform=x64
+msbuild msvc_build/citra.sln /m /p:Configuration=Release,Platform=x64 /t:Rebuild
 
 # pack
 bash pack.sh

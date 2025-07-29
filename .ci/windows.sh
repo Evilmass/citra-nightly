@@ -13,5 +13,5 @@ cmake .. -G "Visual Studio 17 2022" -A x64 \
     -DUSE_DISCORD_PRESENCE=ON \
     -DENABLE_FFMPEG_VIDEO_DUMPER=ON \
     -DENABLE_MF=ON
-msbuild build/citra.sln -t:rebuild -verbosity:diag -property:Configuration=Release -property:Platform=x64
+msbuild build/citra.sln /m /p:Configuration=Release,Platform=x64 /t:Rebuild
 ctest -VV -C Release || echo "::error ::Test error occurred on Windows build"
