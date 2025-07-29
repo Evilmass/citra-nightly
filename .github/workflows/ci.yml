@@ -24,16 +24,16 @@ jobs:
           path: artifacts/
   windows:
     runs-on: windows-2022
-    strategy:
-      matrix:
-        arch:
-          - x64
-        sdk:
-          - 10.0.19041.0
-        toolset:
-          - 19.16.27023
-        vsversion:
-          - '2022'
+    # strategy:
+    #   matrix:
+    #     arch:
+    #       - x64
+    #     sdk:
+    #       - 10.0.19041.0
+    #     toolset:
+    #       - 19.16.27023
+    #     vsversion:
+    #       - '2022'
     steps:
       - uses: actions/checkout@v4
         with:
