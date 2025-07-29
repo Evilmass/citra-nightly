@@ -52,7 +52,9 @@ mkdir msvc_build && cd msvc_build
 
 # from local
 # C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX64\x64\cl.exe
+
 # from appveyor
+# https://ci.appveyor.com/project/Evilmass/citra-nightly/builds/52475392?fullLog=true#L479
 # C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\CL.exe 
 
 # from actions
