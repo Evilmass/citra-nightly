@@ -2,6 +2,7 @@
 ==============
 update .gitignore
 update default.ini
+update disable_telemetry
 add pack.sh
 add appveyor.yml
 fix submodules
@@ -11,7 +12,40 @@ fix msbuild error
 受的转换)
     https://github.com/Evilmass/citra-nightly/commits/cb44e4408d5e3fd6ec4f7c39c51aa094389408ba/src/core/hle/kernel/thread.cpp?since=2020-05-11&until=2021-01-01
     https://github.com/Evilmass/citra-nightly/blob/ce16653cc81a1298a34741a7af4808da988a190f/src/core/hle/kernel/thread.cpp#L123
+update ci.yml
 
+mscv build
+==============
+<!-- [Visual Studio 2017 BuildTools](https://aka.ms/vs/15/release/vs_buildtools.exe) -->
+[Visual Studio 2022 BuildTools](https://aka.ms/vs/17/release/vs_buildtools.exe)
+<!-- [winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
+- only select `Debugging Tools For Windows` -> pdbstr.exe -->
+[Git For Windows](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
+[Cmake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
+[7z](https://www.7-zip.org/a/7z2500-x64.exe)
+<!-- https://www.doxygen.nl/files/doxygen-1.14.0.windows.x64.bin.zip -->
+
+```shell
+# git bash
+git clone -b 1671 --recursive https://github.com/Evilmass/citra-nightly.git
+
+# cmake
+mkdir msvc_build && cd msvc_build
+# VS2017
+# cmake .. -G "Visual Studio 15 2017 Win64"
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_GENERATOR_TOOLSET=v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+cd ..
+
+## 若你仅修改了源代码，而没有改变 CMakeLists.txt 文件，可以跳过 CMake 配置步骤，直接重新编译。
+# rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
+
+# build
+"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
+msbuild msvc_build/citra.sln /m /p:Configuration=Release,Platform=x64 /t:Rebuild
+
+# pack
+bash pack.sh
+```
 
 **BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
 
