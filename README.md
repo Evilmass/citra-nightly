@@ -66,7 +66,7 @@ cd ..
 # msbuild
 # https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022
 "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
-msbuild msvc_build/citra.sln -terminalLogger:on -terminalloggerparameters:verbosity=diagnostic -fileLogger -fileloggerparameters:logfile=citra_msbuild.log;verbosity=diagnostic -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+msbuild msvc_build/citra.sln -terminalLogger:on -terminalloggerparameters:verbosity=diagnostic -fileLogger -fileloggerparameters:logfile=msbuild.log;verbosity=diagnostic -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 
 # pack
 bash pack.sh

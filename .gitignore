@@ -4,6 +4,7 @@
 doc-build/
 head/
 citra-windows*
+msbuild.log
 
 # Generated source files
 src/common/scm_rev.cpp
