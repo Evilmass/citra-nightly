@@ -47,17 +47,30 @@ mkdir msvc_build && cd msvc_build
 # toolset
 # https://cmake.org/cmake/help/latest/variable/CMAKE_GENERATOR_TOOLSET.html#visual-studio-toolset-selection
 # https://cmake.org/cmake/help/latest/variable/CMAKE_VS_PLATFORM_TOOLSET.html#variable:CMAKE_VS_PLATFORM_TOOLSET
+# -T v141
 # -DCMAKE_GENERATOR_TOOLSET=v141
 
 # from local
-# C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\cl.exe
+# C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX64\x64\cl.exe
 
 # from actions
 # VCToolsInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\
 # VCToolsVersion: 14.44.35207
 # WindowsSDKLibVersion: 10.0.26100.0
 
-cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+# solution
+# https://github.com/ilammy/msvc-dev-cmd/issues/92
+# https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022
+
+vs_BuildTools powershell
+```shell
+# 下载 VS Build Tools 安装器
+Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vs_BuildTools.exe" -OutFile "vs_BuildTools.exe"
+# 安装 v141 工具集（VS2017 生成工具）
+Start-Process -FilePath ./vs_BuildTools.exe -ArgumentList "--add", "Microsoft.VisualStudio.Component.VC.v141.x86.x64", "Microsoft.VisualStudio.Component.Windows10SDK.19041", "--quiet", "--norestart", "--force", "--wait" -Wait -PassThru
+```
+
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_C_COMPILER="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.16.27023\bin\HostX64\x64\cl.exe" -DCMAKE_CXX_COMPILER="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.16.27023\bin\HostX64\x64\cl.exe" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 cd ..
 
 ## 若你仅修改了源代码，而没有改变 CMakeLists.txt 文件，可以跳过 CMake 配置步骤，直接重新编译。
@@ -65,8 +78,8 @@ cd ..
 
 # msbuild
 # https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022
-"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
-msbuild msvc_build/citra.sln -terminalLogger:on -terminalloggerparameters:verbosity=diagnostic -fileLogger -fileloggerparameters:logfile=msbuild.log;verbosity=diagnostic -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+# -terminalLogger:on -terminalloggerparameters:verbosity=diagnostic -fileLogger -fileloggerparameters:logfile=msbuild.log;verbosity=diagnostic 
+msbuild msvc_build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 
 # pack
 bash pack.sh
