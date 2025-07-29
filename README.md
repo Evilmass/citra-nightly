@@ -1,6 +1,4 @@
-Revert 1543
-==============
-d11d600b61e44599a3b7379727263396e51b6ef4
+dev
 
 cherry-pick
 ==============
@@ -28,7 +26,8 @@ cherry-pick
 
 mscv build only
 ==============
-[Visual Studio 2017 Buildtools](https://aka.ms/vs/15/release/vs_buildtools.exe)
+[Visual Studio 2017 BuildTools](https://aka.ms/vs/15/release/vs_buildtools.exe)
+[Visual Studio 2012 BuildTools](https://aka.ms/vs/15/release/vs_buildtools.exe)
 
 [winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
 - only select `Debugging Tools For Windows` -> pdbstr.exe
@@ -47,13 +46,16 @@ git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
 
 # cmake
 mkdir msvc_build && cd msvc_build
-cmake .. -Wno-dev -G "Visual Studio 15 2017 Win64" -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+# VS 2017
+# cmake .. -G "Visual Studio 15 2017 Win64"
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_GENERATOR_TOOLSET=v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 cd ..
 
 ## 若你仅修改了源代码，而没有改变 CMakeLists.txt 文件，可以跳过 CMake 配置步骤，直接重新编译。
-rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
+# rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
 
 # build
+"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
 msbuild msvc_build/citra.sln -t:rebuild -verbosity:diag -property:Configuration=Release -property:Platform=x64
 
 # pack
