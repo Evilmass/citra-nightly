@@ -47,16 +47,17 @@ mkdir msvc_build && cd msvc_build
 # toolset
 # https://cmake.org/cmake/help/latest/variable/CMAKE_GENERATOR_TOOLSET.html#visual-studio-toolset-selection
 # https://cmake.org/cmake/help/latest/variable/CMAKE_VS_PLATFORM_TOOLSET.html#variable:CMAKE_VS_PLATFORM_TOOLSET
-
+# -DCMAKE_GENERATOR_TOOLSET=v141 
 cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 cd ..
 
 ## 若你仅修改了源代码，而没有改变 CMakeLists.txt 文件，可以跳过 CMake 配置步骤，直接重新编译。
 # rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
 
-# build
+# msbuild
+# https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022
 "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
-msbuild msvc_build/citra.sln /m /p:Configuration=Release,Platform=x64 /t:Rebuild
+msbuild msvc_build/citra.sln -terminalLogger:on -terminalloggerparameters:verbosity=diagnostic -fileLogger -fileloggerparameters:logfile=citra_msbuild.log;verbosity=diagnostic -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 
 # pack
 bash pack.sh
