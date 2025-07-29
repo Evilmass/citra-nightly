@@ -47,7 +47,16 @@ mkdir msvc_build && cd msvc_build
 # toolset
 # https://cmake.org/cmake/help/latest/variable/CMAKE_GENERATOR_TOOLSET.html#visual-studio-toolset-selection
 # https://cmake.org/cmake/help/latest/variable/CMAKE_VS_PLATFORM_TOOLSET.html#variable:CMAKE_VS_PLATFORM_TOOLSET
-# -DCMAKE_GENERATOR_TOOLSET=v141 
+# -DCMAKE_GENERATOR_TOOLSET=v141
+
+# from local
+# C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX64\x64\cl.exe
+
+# from actions
+# VCToolsInstallDir: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\
+# VCToolsVersion: 14.44.35207
+# WindowsSDKLibVersion: 10.0.26100.0
+
 cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 cd ..
 
