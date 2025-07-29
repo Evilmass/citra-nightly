@@ -72,7 +72,7 @@ vs_BuildTools powershell
 Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vs_BuildTools.exe" -OutFile "vs_BuildTools.exe"
 # 安装 v141 工具集（VS2017 生成工具）
 Start-Process -FilePath ./vs_BuildTools.exe -ArgumentList "--add", "Microsoft.VisualStudio.Component.VC.v141.x86.x64", "Microsoft.VisualStudio.Component.Windows10SDK.19041", "--quiet", "--norestart", "--force", "--wait" -Wait -PassThru
-```
+
 
 cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_C_COMPILER="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe" -DCMAKE_CXX_COMPILER="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 cd ..
