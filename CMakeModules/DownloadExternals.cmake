@@ -17,7 +17,7 @@ function(download_bundled_external remote_path lib_name prefix_var)
     # Extract archive if needed
     if(NOT EXISTS "${prefix}")
         message(STATUS "Extracting ${archive} to ${prefix}")
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf "${archive}"
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf "${archive}"
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/externals")
     endif()
 

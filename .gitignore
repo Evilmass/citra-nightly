@@ -1,7 +1,8 @@
 # Build directory
-*[Bb]uild/
 doc-build/
+*[Bb]uild/
 head/
+*_head/
 citra-windows*
 
 # Generated source files

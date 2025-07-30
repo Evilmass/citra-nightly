@@ -1,74 +1,96 @@
-ORIGINAL README
-========
-[ORIGINAL_README](./ORIGINAL_README.md)
+# Original Repo README
 
-# citra-mhxx
+See [ORIGINAL_REPO_README](./ORIGINAL_REPO_README.md)
 
-custom-built emulator based [nightly 1543](https://web.archive.org/web/20220908222930/https://github.com/citra-emu/citra-nightly/releases/tag/nightly-1543) -> [the last build before the core timing rewrite](https://web.archive.org/web/20230603005840/https://citra-emu.org/wiki/citra-legacy-builds/#last-build-before-the-core-timing-rewrite), optimized for monster hunter double cross
-- fix lag: `periodic slowdowns with frame drops`
-- port some functions: `touch-mapping, fix SaveStaes key`
+---
 
-This fork was inspired by Lurpigi's fork
+## citra-mhxx
 
+Custom-built emulator based on [nightly 1543](https://web.archive.org/web/20220908222930/https://github.com/citra-emu/citra-nightly/releases/tag/nightly-1543) → [last build before the core timing rewrite](https://web.archive.org/web/20230603005840/https://citra-emu.org/wiki/citra-legacy-builds/#last-build-before-the-core-timing-rewrite), optimized for Monster Hunter Double Cross
+
+- **Fix lag:** Periodic slowdowns with frame drops
+- **Port functions:** Touch-mapping, fix SaveStates hotkeys
+
+Inspired by
 - [Lurpigi/Lime3DS](https://github.com/Lurpigi/lime3ds-dqmj3p)
+- [Slashaim/citra-dqmj3pro](https://github.com/Slashaim/citra-dqmj3pro)
 
-## buildtools
+**Warning**
+- Do not cherry-pick this commit: [Update FPS to roughly match the actual 3DS rate](https://github.com/Evilmass/citra-nightly/commit/5e95b35900bb8c840169c4446634ff67982aa842), It will cause the frame rate to randomly drop to 56.
+- also keep `src\core\hw\gpu.h -> SCREEN_REFRESH_RATE = 60`
 
-- [Visual Studio 2017](https://aka.ms/vs/15/release/vs_buildtools.exe)
+---
+
+## TODO
+
+- [ ] [QT: Add Custom Layout Menu Option](https://github.com/Lurpigi/lime3ds-dqmj3p/commit/0313178d32c70445a85580c67dcaf1fc69ac19d4)
+- [ ] Restore all hotkeys
+- [ ] [citra_qt: Improvements to hotkeys and UI state management (#6224)](https://github.com/Evilmass/citra-nightly/commit/f66d03dd48ac81ce0cc0f1d0616d2f07093a59a3)
+- [ ] [Automatic Controller Binding (#5100)](https://github.com/Evilmass/citra-nightly/commit/ce16653cc81a1298a34741a7af4808da988a190f)
+  → `git log --all --regexp-ignore-case --grep="auto mapping"`
+
+---
+
+## Changelog
+
+### v1.0.0
+
+1. Reset --hard from [nightly1543](d11d600b61e44599a3b7379727263396e51b6ef4)
+2. Fix submodules: `dynarmic`, `soundtouch`
+3. Fix CMakeLists.txt: `ffmpeg-4.2.1-win64`, `qt-5.10.0-msvc2017_64` (add qttools), `clang-format-15`
+4. Update default.ini: `web_api_url`, disable telemetry
+5. Add submodule `dist/compatibility_list`
+6. Fix appveyor.yml: only build MSVC
+7. Rename main title: `citra-mhxx`
+
+### v1.1.0
+
+1. Cherry-pick [Avoid leaking the cubeb input stream](https://github.com/Evilmass/citra-nightly/commit/81a1e5680f93189d6029f579b4b261b2aa552818)
+2. Cherry-pick [Actually save the input when clearing/resetting to default](https://github.com/Evilmass/citra-nightly/commit/8d19e144cb46c258107d90d77fb8258a945031d9)
+3. Merge [input-touch-mapping](https://github.com/Evilmass/citra-nightly/commit/81a1e5680f93189d6029f579b4b261b2aa552818)
+4. Merge [save_default_controls](https://github.com/Evilmass/citra-nightly/commit/76253063a37e70733ac3ede712cd18cfcdff5bd6)
+5. Cherry-pick [Minor frontend fixes to savestates (#5430)](https://github.com/Evilmass/citra-nightly/commit/6a77547bdee43ee67e3199354dd3de22f3b4a232)
+
+---
+
+## Build Tools
+
+- [VS2022 Build Tools](https://aka.ms/vs/17/release/vs_buildtools.exe)
+
+  `Windows 10 SDK (10.0.19041.0) + MSVC v141 VS2017 C++ x64-86 BuildTools (v14.16.27023)`
 - [Git](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
-- [Cmake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
-- [7z](https://www.7-zip.org/a/7z2500-x64.exe)
+- [CMake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
+- [7-Zip](https://www.7-zip.org/a/7z2500-x64.exe)
 
+---
 
-## mscv build
-```shell
-# git bash
+## MSVC Build
+
+```sh
+# git-bash --login -i
 git clone -b mhxx --recursive https://github.com/Evilmass/citra-nightly.git
 
 # cmake
-mkdir msvc_build && cd msvc_build
-cmake .. -G "Visual Studio 15 2017 Win64" -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+mkdir v1.1.0_build && cd v1.1.0_build
+# VS 2022 → toolset 141 → MSVC 2017
+cmake .. --fresh -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+# VS 2017
+# cmake .. -G "Visual Studio 15 2017 Win64"
 cd ..
 
-# if u not modified CMakeLists.txt file, skip the CMake configuration step and recompile directly
+# If you did not modify CMakeLists.txt, skip CMake configuration and recompile directly
 # rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
 
 # build
-rm -rf msvc_build/bin
-msbuild msvc_build/citra.sln /p:Configuration=Release /p:Platform=x64 /t:Rebuild /m:8
+rm -rf v1.1.0_build/bin
+msbuild v1.1.0_build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 
 # pack
 bash pack.sh
 ```
 
+---
 
-## appveyor
+## AppVeyor
 
-check build logs: [https://ci.appveyor.com/project/Evilmass/citra-nightly](https://ci.appveyor.com/project/Evilmass/citra-nightly)
-
-
-## changelog
-
-### v1.0.0
-
-1. reset --hard from [nightly1543](d11d600b61e44599a3b7379727263396e51b6ef4)
-2. fix submodules: `dynarmic, soundtouch`
-3. fix CMakeLists.txt: `ffmpeg-4.2.1-win64, qt-5.10.0-msvc2017_64(add qttools), clang-format-15`
-4. update default.ini: `web_api_url, disable telemetry`
-5. add submodule `dist/compatibility_list`
-6. fix appveyor.yml: `only build msvc`
-7. rename main title: `citra-mhxx`
-
-
-## cherry-pick
-
-- [ ] [Avoid leaking the cubeb input stream](https://github.com/Evilmass/citra-nightly/commit/81a1e5680f93189d6029f579b4b261b2aa552818)
-- [ ] [Actually save the input when clearing/resetting to default](https://github.com/Evilmass/citra-nightly/commit/8d19e144cb46c258107d90d77fb8258a945031d9)
-- [ ] [Don't translate hotkey text](https://github.com/Evilmass/citra-nightly/commit/1d5d278f8d87acf2688b36e157c8b053e71cdd1f)
-- [ ] [Minor frontend fixes to savestates (#5430)](https://github.com/Evilmass/citra-nightly/commit/6a77547bdee43ee67e3199354dd3de22f3b4a232)
-- [ ] [Update translations (2020-07-01)](https://github.com/Evilmass/citra-nightly/commit/add0deb3c5399dbc2dc935cba70d1bf074c3a38f)
-- [ ] [Merge pull request #5163 from z87/input-touch-mapping](https://github.com/Evilmass/citra-nightly/commit/81a1e5680f93189d6029f579b4b261b2aa552818)
-  -> `git cherry-pick 81a1e56 -m 1`
-- [ ] [citra_qt: Improvements to hotkeys and ui state management (#6224)](https://github.com/Evilmass/citra-nightly/commit/f66d03dd48ac81ce0cc0f1d0616d2f07093a59a3)
-- [ ] [Automatic Controller Binding (#5100)](https://github.com/Evilmass/citra-nightly/commit/ce16653cc81a1298a34741a7af4808da988a190f)
-  -> `git log --all --regexp-ignore-case --grep="auto mapping"`
+Full build logs: [https://ci.appveyor.com/project/Evilmass/citra-nightly](https://ci.appveyor.com/project/Evilmass/citra-nightly)

@@ -19,7 +19,7 @@ get_timestamp(BUILD_DATE)
 # Generate cpp with Git revision from template
 # Also if this is a CI build, add the build name (ie: Nightly, Canary) to the scm_rev file as well
 set(REPO_NAME "citra-mhxx")
-set(BUILD_VERSION "v1.0.0")
+set(BUILD_VERSION "v1.1.0")
 if (DEFINED ENV{CI})
   if (DEFINED ENV{TRAVIS})
     set(BUILD_REPOSITORY $ENV{TRAVIS_REPO_SLUG})
