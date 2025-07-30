@@ -1,18 +1,9 @@
-1671 auto mapping button revert core timing
-==============
-update .gitignore
-update default.ini
-update disable_telemetry
-add pack.sh
-add appveyor.yml
-fix submodules
-fix CMakeModules\DownloadExternals.cmake
-fix msbuild error
-    C:\Users\Evilmass\Desktop\dev\src\core\hle\kernel\thread.cpp(123): error C2679: 二进制“=”: 没有找到接受“std::weak_ptr<_Ty>”类型的右操作数的运算符(或没有可接
-受的转换)
-    https://github.com/Evilmass/citra-nightly/commits/cb44e4408d5e3fd6ec4f7c39c51aa094389408ba/src/core/hle/kernel/thread.cpp?since=2020-05-11&until=2021-01-01
-    https://github.com/Evilmass/citra-nightly/blob/ce16653cc81a1298a34741a7af4808da988a190f/src/core/hle/kernel/thread.cpp#L123
-update ci.yml
+1671
+
+- auto mapping button
+- revert core timing
+- revert roughly match the actual 3DS rate (also need fix `src\core\hw\gpu.cpp` -> `const u64 frame_ticks = static_cast<u64>(BASE_CLOCK_RATE_ARM11 / SCREEN_REFRESH_RATE);`)
+
 
 mscv build
 ==============
