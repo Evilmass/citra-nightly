@@ -24,16 +24,6 @@ jobs:
           path: artifacts/
   windows:
     runs-on: windows-2022
-    # strategy:
-    #   matrix:
-    #     arch:
-    #       - x64
-    #     sdk:
-    #       - 10.0.19041.0
-    #     toolset:
-    #       - 19.16.27023
-    #     vsversion:
-    #       - '2022'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,11 +37,6 @@ jobs:
             ${{ runner.os }}-win-
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
-        # with:
-        #   arch: ${{ matrix.arch }}
-        #   sdk: ${{ matrix.sdk }}
-        #   toolset: ${{ matrix.toolset }}
-        #   vsversion: ${{ matrix.vsversion }}
       - name: Install VS2017 Build Tools (v141)
         run: |
           # 下载 VS Build Tools 安装器
