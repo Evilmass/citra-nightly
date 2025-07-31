@@ -62,7 +62,7 @@ jobs:
         run: git config --global core.autocrlf input
       - name: Build
         shell: pwsh
-        run: ./.ci/windows.sh
+        run: ./.ci/windows.ps1
       - name: Pack
         run: ./.ci/pack.sh
       - name: Upload
