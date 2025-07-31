@@ -17,7 +17,8 @@ jobs:
           - 141
           - 142
           - 14.1
-          - 14.2
+          - 14.16
+          - 14.2 # equal to 14.29
           - 14.29
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
@@ -25,6 +26,15 @@ jobs:
           arch: x64
           toolset: ${{ matrix.toolset_ver }}
       # https://learn.microsoft.com/cpp/build/reference/help-compiler-command-line-help
+
+      - name: Install VS2017 Build Tools (v141)
+        run: |
+          # 下载 VS Build Tools 安装器
+          Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vs_BuildTools.exe" -OutFile "vs_BuildTools.exe"
+          # 安装 v141 工具集（VS2017 生成工具）
+          Start-Process -FilePath ./vs_BuildTools.exe -ArgumentList "--add", "Microsoft.VisualStudio.Component.VC.v141.x86.x64", "Microsoft.VisualStudio.Component.Windows10SDK.19041", "--quiet", "--norestart", "--force", "--wait" -Wait -PassThru
+        shell: pwsh  # 指定使用 PowerShell 执行
+
       - run: |
           "CL_VERSION=$(cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive -SimpleMatch)" | Out-File -Append -FilePath ${env:\GITHUB_OUTPUT}
         shell: pwsh
