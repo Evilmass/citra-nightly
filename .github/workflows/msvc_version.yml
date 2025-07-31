@@ -19,23 +19,27 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
-      
-      - name: 显示工作目录内容
-        run: Get-ChildItem -Recurse
-        shell: pwsh
-      
-      - name: 验证脚本存在
-        run: |
-          if (Test-Path ./.ci/msvc_version.ps1) {
-            Write-Host "MSVC 版本脚本存在"
-          } else {
-            Write-Host "错误: MSVC 版本脚本不存在"
-            exit 1
-          }
-        shell: pwsh
-      
+
       - name: 自定义安装 MSVC v141
-        run: ./.ci/msvc_version.ps1
+        run: |
+          # 下载 VS Build Tools 安装器
+          Invoke-WebRequest -Uri "https://aka.ms/vs/15/release/vs_BuildTools.exe" -OutFile "vs_buildtools.exe"
+          # 安装 v141 工具集（VS2017 生成工具）
+          ./vs_buildtools.exe --wait --norestart --nocache `
+              --add Microsoft.VisualStudio.Workload.MSBuildTools `
+              --add Microsoft.VisualStudio.Workload.VCTools `
+              --add Microsoft.VisualStudio.Component.TestTools.BuildTools `
+              --add Microsoft.VisualStudio.Component.VC.CMake.Project `
+              --add Microsoft.VisualStudio.Component.Windows10SDK.19041 `
+              --add Microsoft.VisualStudio.Component.VC.v141.x86.x64 `
+              --add Microsoft.VisualStudio.VC.MSBuild.v150.x64.v141 `
+              --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 `
+              --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 `
+              --remove Microsoft.VisualStudio.Component.Windows10SDK.14393 `
+              --remove Microsoft.VisualStudio.Component.Windows10SDK.16299 `
+              --remove Microsoft.VisualStudio.Component.Windows10SDK.17134 `
+              --remove Microsoft.VisualStudio.Component.Windows10SDK.17763 `
+              --remove Microsoft.VisualStudio.Component.Windows81SDK
         shell: pwsh
       
       - name: 检查工具集版本

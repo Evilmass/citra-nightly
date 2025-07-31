@@ -5,6 +5,7 @@ Invoke-WebRequest -Uri "https://aka.ms/vs/15/release/vs_BuildTools.exe" -OutFile
 
 # 安装 v141 工具集（VS2017 生成工具）
 ./vs_buildtools.exe --wait --norestart --nocache `
+    --installPath C:\BuildTools `
     --add Microsoft.VisualStudio.Workload.MSBuildTools `
     --add Microsoft.VisualStudio.Workload.VCTools `
     --add Microsoft.VisualStudio.Component.TestTools.BuildTools `
