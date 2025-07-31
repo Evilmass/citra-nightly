@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "*" ]
+    branches: [ "main" ]
   workflow_dispatch:
 jobs:
   test:
@@ -15,11 +15,31 @@ jobs:
         toolset_ver:
           - "v140"
           - "v141"
-          - "v142"
+          - 140
+          - 141
+          - 14
           - "14.0"
-          - "14.16"
+          - 14.1
           - 14.2
           - 14.21
+          - 14.22
+          - 14.23
+          - 14.24
+          - 14.25
+          - 14.26
+          - 14.27
+          - 14.28
+          - 14.29
+          - "14.30"
+          - 14.3
+          - 14.31
+          - 14.32
+          - 14.33
+          - 14.34
+          - 14.35
+          - 14.36
+          - 14.37
+          - 14.38
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         with:
