@@ -1,3 +1,6 @@
+# workload 安装全部 required，component 单独组件
+# https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022#desktop-development-with-c
+
 name: MSVC-CI
 on:
   push:
@@ -8,10 +11,10 @@ jobs:
   check_version:
     runs-on: windows-2022
     steps:
-      - name: Checkout code
+      - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: Install MSVC 2017
+      - name: 安装 MSVC 2017
         shell: pwsh
         run: |
           # workload 安装全部 required，component 单独组件
@@ -29,19 +32,28 @@ jobs:
 
           # 下载安装器
           Invoke-WebRequest -Uri $vs_url -OutFile "vs_buildtools.exe"
+          if (-not (Test-Path "vs_buildtools.exe")) {
+              Write-Error "Failed to download VS Build Tools"
+              exit 1
+          }
 
-          # 安装
-          $componentArgs = $components | ForEach-Object { "--add `"$($_)`"" } -join " "
+          # 构造安装命令（修正后的语法）
+          $componentArgs = ($components | ForEach-Object { "--add $_" }) -join " "
           $installCmd = ".\vs_buildtools.exe --quiet --wait --norestart --nocache --installPath C:\BuildTools $componentArgs"
 
           Write-Host "Running: $installCmd"
-          iex $installCmd
+          Start-Process -FilePath ".\vs_buildtools.exe" -ArgumentList $installCmd.Split() -Wait
+
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "VS Build Tools installation failed"
+              exit $LASTEXITCODE
+          }
 
       - name: 验证 cl 编译器版本
         shell: cmd
         run: |
           call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
-          cl /Bv
+          cl /?
 
       # - uses: ilammy/msvc-dev-cmd@v1
       #   with:
