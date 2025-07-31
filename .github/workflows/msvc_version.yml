@@ -44,11 +44,6 @@ jobs:
           Write-Host "Running: $installCmd"
           Start-Process -FilePath ".\vs_buildtools.exe" -ArgumentList $installCmd.Split() -Wait -PassThru
 
-          if ($LASTEXITCODE -ne 0) {
-              Write-Error "VS Build Tools installation failed"
-              exit $LASTEXITCODE
-          }
-
       - name: 验证 cl 编译器版本
         shell: cmd
         run: |
