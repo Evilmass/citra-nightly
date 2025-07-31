@@ -1,8 +1,8 @@
 #!/bin/sh -ex
 
+call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
 mkdir build && cd build
-# cmake .. -G "Visual Studio 15 2017 Win64" -A x64 \
-cmake .. -G "Visual Studio 17 2022" -A x64 \
+cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCITRA_USE_BUNDLED_QT=1 \
@@ -14,8 +14,5 @@ cmake .. -G "Visual Studio 17 2022" -A x64 \
     -DENABLE_FFMPEG_VIDEO_DUMPER=ON \
     -DENABLE_MF=ON
 cd ..
-msbuild build/citra.sln \
-    -property:Configuration=Release,Platform=x64 \
-    -maxCpuCount \
-    -target:Rebuild
+msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 ctest -VV -C Release || echo "::error ::Test error occurred on Windows build"
