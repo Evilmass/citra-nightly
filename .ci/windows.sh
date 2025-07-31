@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 
-call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
+. "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
 mkdir build && cd build
 cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 \
     -DCMAKE_BUILD_TYPE=Release \
