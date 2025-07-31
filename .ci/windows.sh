@@ -14,10 +14,10 @@
 # cd ..
 # msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 
-
+"C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
 mkdir build && cd build
 
-cmake .. -G Ninja -T v141 \
+cmake .. -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
