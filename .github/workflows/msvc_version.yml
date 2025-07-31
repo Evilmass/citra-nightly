@@ -44,7 +44,7 @@ jobs:
       
       - name: 检查工具集版本
         run: |
-          $compilerInfo = cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive
+          $compilerInfo = 'C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x86\cl.exe' /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive
           "$($compilerInfo.Line)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
         shell: pwsh
         id: cl
