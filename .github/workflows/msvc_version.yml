@@ -18,19 +18,16 @@ jobs:
           - 14.2 # 等同于14.29
           - 14.29
     steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 安装VS2017 Build Tools (v141)
-        run: |
-          $scriptPath = Resolve-Path -Path ./.ci/msvc_version.ps1
-          Write-Host "使用脚本路径: $scriptPath"
-          & $scriptPath
+      - name: custom install msvc v141
+        run: ./.ci/msvc_version.ps1
         shell: pwsh
 
-      - run: |
-          "CL_VERSION=$(cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive -SimpleMatch)" | Out-File -Append -FilePath ${env:GITHUB_OUTPUT}
+      - name: check toolset version
+      - run: "CL_VERSION=$(cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive -SimpleMatch)" Out-File -Append -FilePath ${env:GITHUB_OUTPUT}
         shell: pwsh
         id: cl
 
+      - name: echo toolset version
       - run: echo "::warning ::Windows + toolset-${{ matrix.toolset_ver }} = ${{ steps.cl.outputs.CL_VERSION }}"
