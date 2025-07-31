@@ -27,7 +27,7 @@
 
 namespace GPU {
 
-/// 268MHz CPU clocks / 60Hz frames per second
+// 268MHz CPU clocks / 60Hz frames per second
 const u64 frame_ticks = static_cast<u64>(BASE_CLOCK_RATE_ARM11 / SCREEN_REFRESH_RATE);
 
 Regs g_regs;

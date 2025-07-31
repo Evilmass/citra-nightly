@@ -1,41 +1,63 @@
-1671
+# citra-nightly
 
-- auto mapping button
-- revert core timing
-- revert roughly match the actual 3DS rate (also need fix `src\core\hw\gpu.cpp` -> `const u64 frame_ticks = static_cast<u64>(BASE_CLOCK_RATE_ARM11 / SCREEN_REFRESH_RATE);`)
+Custom-built emulator optimized for Monster Hunter Double Cross
+- **Fix lag:** Periodic slowdowns with frame drops
+- **Port functions:** Touch-mapping, fix SaveStates hotkeys
+
+Inspired by
+- [Lurpigi/Lime3DS](https://github.com/Lurpigi/lime3ds-dqmj3p)
+- [Slashaim/citra-dqmj3pro](https://github.com/Slashaim/citra-dqmj3pro)
+
+**Important**
+
+1. **Revert [Improve core timing accuracy (#5257)](https://github.com/Evilmass/citra-nightly/commit/57aa18f52ea35ca74cd1a6c406a4abf04049b44e)**
+   - This commit introduced sudden frame rate drops to **56 FPS**
+2. **Revert [Update FPS to roughly match the actual 3DS rate](https://github.com/Evilmass/citra-nightly/commit/5e95b35900bb8c840169c4446634ff67982aa842)**
+   - This commit caused the frame rate to fluctuate between **58–60 FPS**
+3. **Maintain `SCREEN_REFRESH_RATE = 60`**
+   - Keeping this setting ensures the emulator runs at a **steady 60 FPS**
+
+```c
+// src\core\hw\gpu.h
+constexpr float SCREEN_REFRESH_RATE = 60;
+
+// src\core\hw\gpu.cpp
+// 268MHz CPU clocks / 60Hz frames per second
+const u64 frame_ticks = static_cast<u64>(BASE_CLOCK_RATE_ARM11 / SCREEN_REFRESH_RATE);
+```
 
 
-mscv build
-==============
-<!-- [Visual Studio 2017 BuildTools](https://aka.ms/vs/15/release/vs_buildtools.exe) -->
-[Visual Studio 2022 BuildTools](https://aka.ms/vs/17/release/vs_buildtools.exe)
-<!-- [winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
-- only select `Debugging Tools For Windows` -> pdbstr.exe -->
-[Git For Windows](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
-[Cmake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
-[7z](https://www.7-zip.org/a/7z2500-x64.exe)
-<!-- https://www.doxygen.nl/files/doxygen-1.14.0.windows.x64.bin.zip -->
+## buildtools
+- **[VS2022_BuildTools](https://aka.ms/vs/17/release/vs_buildtools.exe)**
+- **[Vulkan SDK 1.4.304.1](https://sdk.lunarg.com/sdk/download/1.4.304.1/windows/VulkanSDK-1.4.304.1-Installer.exe)**
+- **[Cmake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)**
+- **[Git](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)**
+- **[7z](https://www.7-zip.org/a/7z2500-x64.exe)**
+
+<!-- ```shell
+# vulkan SDK
+VulkanSDK-1.4.304.1-Installer.exe --accept-licenses --default-answer --confirm-command install --system-proxy=http://127.0.0.1:10808
+``` -->
+
+## build
 
 ```shell
-# git bash
-git clone -b 1671 --recursive https://github.com/Evilmass/citra-nightly.git
+git clone -b 1671 --recursive https://github.com/Evilmass/citra-nightly
+mkdir build && cd build
 
-# cmake
-mkdir msvc_build && cd msvc_build
-# VS2017
-# cmake .. -G "Visual Studio 15 2017 Win64"
-cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_GENERATOR_TOOLSET=v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+# msvc 2019
+cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_BUILD_TYPE=Release -DENABLE_QT_TRANSLATION=ON -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF
 cd ..
-
-## 若你仅修改了源代码，而没有改变 CMakeLists.txt 文件，可以跳过 CMake 配置步骤，直接重新编译。
-# rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
-
-# build
-"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
-msbuild msvc_build/citra.sln /m /p:Configuration=Release,Platform=x64 /t:Rebuild
+msbuild build/citra.sln -m -p:Configuration=Release,Platform=x64 -t:Rebuild
 
 # pack
-bash pack.sh
+bash pack.sh build/
+```
+
+## note
+```shell
+# aqtinstall
+aqt.exe install-qt windows desktop 5.10.0 win64_msvc2017_64 -m qtmultimedia --outputdir ./qt-5.10.0-msvc2017_64 # qttranslations
 ```
 
 **BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
