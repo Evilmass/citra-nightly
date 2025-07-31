@@ -19,8 +19,6 @@ mkdir build && cd build
 
 cmake .. -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCITRA_USE_BUNDLED_QT=1 \
     -DCITRA_USE_BUNDLED_SDL2=1 \
     -DENABLE_QT_TRANSLATION=ON \
