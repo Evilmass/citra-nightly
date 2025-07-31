@@ -12,5 +12,5 @@ $components = @(
 "Microsoft.VisualStudio.Component.VC.CMake.Project"
 )
 $componentArgs = ($components | ForEach-Object { "--add $_" }) -join " "
-$installCmd = ".\vs_buildtools.exe --quiet --norestart --force --wait --installPath C:\BuildTools $componentArgs"
+$installCmd = ".\vs_buildtools.exe --includeRecommended --quiet --norestart --force --wait --installPath C:\BuildTools $componentArgs"
 Start-Process -FilePath ".\vs_buildtools.exe" -ArgumentList $installCmd.Split() -Wait -PassThru
