@@ -18,14 +18,33 @@ jobs:
           - 14.2 # 等同于14.29
           - 14.29
     steps:
-      - name: custom install msvc v141
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 显示工作目录内容
+        run: Get-ChildItem -Recurse
+        shell: pwsh
+      
+      - name: 验证脚本存在
+        run: |
+          if (Test-Path ./.ci/msvc_version.ps1) {
+            Write-Host "MSVC 版本脚本存在"
+          } else {
+            Write-Host "错误: MSVC 版本脚本不存在"
+            exit 1
+          }
+        shell: pwsh
+      
+      - name: 自定义安装 MSVC v141
         run: ./.ci/msvc_version.ps1
         shell: pwsh
-
-      - name: check toolset version
-        run: "CL_VERSION=$(cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive -SimpleMatch)" Out-File -Append -FilePath ${env:GITHUB_OUTPUT}
+      
+      - name: 检查工具集版本
+        run: |
+          $compilerInfo = cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive
+          "$($compilerInfo.Line)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
         shell: pwsh
         id: cl
-
-      - name: echo toolset version
+      
+      - name: 输出工具集版本
         run: echo "::warning ::Windows + toolset-${{ matrix.toolset_ver }} = ${{ steps.cl.outputs.CL_VERSION }}"
