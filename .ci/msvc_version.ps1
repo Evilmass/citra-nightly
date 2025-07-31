@@ -1,8 +1,10 @@
+cd $env:TEMP
+
 # 下载 VS Build Tools 安装器
-Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vs_BuildTools.exe" -OutFile "vs_BuildTools.exe"
+Invoke-WebRequest -Uri "https://aka.ms/vs/15/release/vs_BuildTools.exe" -OutFile "vs_buildtools.exe"
 
 # 安装 v141 工具集（VS2017 生成工具）
-vs_buildtools.exe --wait --norestart --nocache `
+./vs_buildtools.exe --wait --norestart --nocache `
     --installPath C:\BuildTools `
     --add Microsoft.VisualStudio.Workload.MSBuildTools `
     --add Microsoft.VisualStudio.Workload.VCTools `
