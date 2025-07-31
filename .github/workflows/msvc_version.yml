@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019, windows-2022]
+        os: windows-2022
         toolset_ver:
           - "v140"
           - "v141"
@@ -19,6 +19,7 @@ jobs:
           - 141
           - 14
           - "14.0"
+          - "14.1"
           - 14.1
           - 14.2
           - 14.21
