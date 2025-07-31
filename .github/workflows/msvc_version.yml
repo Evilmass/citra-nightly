@@ -7,52 +7,41 @@ on:
 jobs:
   check_version:
     runs-on: windows-2022
-    strategy:
-      matrix:
-        toolset_ver:
-          - "v141"
-          - "v142"
-          - 14.1
-          - 14.16
-          - 14.2 # 等同于14.29
-          - 14.29
     steps:
-      - name: 检出代码
+      - name: Checkout code
         uses: actions/checkout@v4
 
-
-      - name: 安装对应 MSVC Toolset
+      - name: Install MSVC 2017
         shell: pwsh
         run: |
-          $toolset = "${{ matrix.toolset_ver }}"
-          Write-Host "Installing toolset $toolset"
+          # workload 安装全部 required，component 单独组件
+          # https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022#desktop-development-with-c
+
+          Write-Host "Installing MSVC v141"
 
           $vs_url = "https://aka.ms/vs/15/release/vs_BuildTools.exe"
           $components = @(
-            "Microsoft.VisualStudio.Workload.MSBuildTools",
             "Microsoft.VisualStudio.Workload.VCTools",
-            "Microsoft.VisualStudio.Component.TestTools.BuildTools",
-            "Microsoft.VisualStudio.Component.VC.CMake.Project",
             "Microsoft.VisualStudio.Component.Windows10SDK.19041",
             "Microsoft.VisualStudio.Component.VC.v141.x86.x64",
-            "Microsoft.VisualStudio.VC.MSBuild.v150.x64.v141"
+            "Microsoft.VisualStudio.Component.VC.CMake.Project"
           )
 
-          # 下载 VS 安装器
+          # 下载安装器
           Invoke-WebRequest -Uri $vs_url -OutFile "vs_buildtools.exe"
 
-          # 构造安装参数
-          $componentArgs = $components | ForEach-Object { "--add $_" } | Join-String " "
-          $installCmd = ".\vs_buildtools.exe --wait --norestart --nocache --installPath C:\BuildTools $componentArgs"
+          # 安装
+          $componentArgs = $components | ForEach-Object { "--add `"$($_)`"" } -join " "
+          $installCmd = ".\vs_buildtools.exe --quiet --wait --norestart --nocache --installPath C:\BuildTools $componentArgs"
 
           Write-Host "Running: $installCmd"
           iex $installCmd
 
-      
       - name: 验证 cl 编译器版本
         shell: cmd
         run: |
-          "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64 && cl
+          call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
+          cl /Bv
 
       # - uses: ilammy/msvc-dev-cmd@v1
       #   with:
