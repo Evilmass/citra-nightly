@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022]
+        toolset_ver:
+          - "v140"
+          - "v141"
+          - "v142"
+          - "14.0"
+          - "14.16"
+          - 14.2
+          - 14.21
+    steps:
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+          toolset: ${{ matrix.toolset_ver }}
+      # https://learn.microsoft.com/cpp/build/reference/help-compiler-command-line-help
+      - run: |
+          "CL_VERSION=$(cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive -SimpleMatch)" | Out-File -Append -FilePath ${env:\GITHUB_OUTPUT}
+        shell: pwsh
+        id: cl
+      - run: echo '::warning ::${{ matrix.os }} + toolset-${{ matrix.toolset_ver }} = ${{ steps.cl.outputs.CL_VERSION }}'
