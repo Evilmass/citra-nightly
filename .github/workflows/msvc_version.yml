@@ -12,12 +12,12 @@ jobs:
       fail-fast: false
       matrix:
         toolset_ver:
-          - "v140"
           - "v141"
-          - 14.0
+          - "v142"
+          - 141
+          - 142
           - 14.1
           - 14.2
-          - 14.3
           - 14.29
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
