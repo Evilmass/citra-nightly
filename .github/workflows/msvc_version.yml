@@ -39,10 +39,10 @@ jobs:
 
           # 构造安装命令（修正后的语法）
           $componentArgs = ($components | ForEach-Object { "--add $_" }) -join " "
-          $installCmd = ".\vs_buildtools.exe --quiet --wait --norestart --nocache --installPath C:\BuildTools $componentArgs"
+          $installCmd = ".\vs_buildtools.exe --force --quiet --wait --norestart --nocache --installPath C:\BuildTools $componentArgs"
 
           Write-Host "Running: $installCmd"
-          Start-Process -FilePath ".\vs_buildtools.exe" -ArgumentList $installCmd.Split() -Wait
+          Start-Process -FilePath ".\vs_buildtools.exe" -ArgumentList $installCmd.Split() -Wait -PassThru
 
           if ($LASTEXITCODE -ne 0) {
               Write-Error "VS Build Tools installation failed"
