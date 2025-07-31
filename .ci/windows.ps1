@@ -20,4 +20,4 @@ cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 `
 Set-Location -Path ".."
 
 # Build the solution
-msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+"C:\BuildTools\MSBuild\Current\Bin\MSBuild.exe" build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
