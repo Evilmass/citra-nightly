@@ -60,12 +60,9 @@ jobs:
         run: glslangValidator --version
       - name: Disable line ending translation
         run: git config --global core.autocrlf input
-      - name: ShellBuild
+      - name: Build
         shell: bash
         run: ./.ci/windows.sh
-      - name: Build
-        shell: pwsh
-        run: ./.ci/windows.ps1
       - name: Pack
         run: ./.ci/pack.sh
       - name: Upload

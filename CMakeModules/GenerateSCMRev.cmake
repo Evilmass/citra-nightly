@@ -32,9 +32,8 @@ if (DEFINED ENV{CI})
     set(BUILD_TAG $ENV{BITRISE_GIT_TAG})
   endif()
 
-  # 修正：添加变量检查并正确使用 string(REGEX MATCH)
   if (BUILD_REPOSITORY)
-    string(REGEX MATCH "citra-emu/citra-?(.*)" OUTVAR "${BUILD_REPOSITORY}")
+    string(REGEX MATCH "Evilmass/citra-?(.*)" OUTVAR "${BUILD_REPOSITORY}")
     if (CMAKE_MATCH_COUNT GREATER 0)
       # capitalize the first letter of each word in the repo name.
       string(REPLACE "-" ";" REPO_NAME_LIST ${CMAKE_MATCH_1})
@@ -47,7 +46,6 @@ if (DEFINED ENV{CI})
       endforeach()
 
       if (BUILD_TAG)
-        # 修正：正确使用 string(REGEX MATCH)
         string(REGEX MATCH "${CMAKE_MATCH_1}-([0-9]+)" OUTVAR "${BUILD_TAG}")
         if (CMAKE_MATCH_COUNT GREATER 0)
           set(BUILD_VERSION ${CMAKE_MATCH_1})

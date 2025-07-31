@@ -36,6 +36,6 @@ else
     for ARTIFACT in build/*; do
         FILENAME=$(basename "$ARTIFACT")
         EXTENSION="${FILENAME##*.}"
-        mv "$ARTIFACT" "artifacts/$REV_NAME.$EXTENSION"
+        # mv "$ARTIFACT" "artifacts/$REV_NAME.$EXTENSION"
     done
 fi
