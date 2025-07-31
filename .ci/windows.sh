@@ -19,8 +19,8 @@ mkdir build && cd build
 
 cmake .. -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER_LAUNCHER="C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe" \
-    -DCMAKE_CXX_COMPILER_LAUNCHER="C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe" \
+    -CMAKE_C_COMPILER="C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe" \
+    -CMAKE_CXX_COMPILER="C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe" \
     -DCITRA_USE_BUNDLED_QT=1 \
     -DCITRA_USE_BUNDLED_SDL2=1 \
     -DENABLE_QT_TRANSLATION=ON \
