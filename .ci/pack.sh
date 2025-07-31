@@ -40,7 +40,7 @@ if [ -z "${UPLOAD_RAW}" ]; then
     mv "$REV_NAME.7z" artifacts/
 else
     # Directly upload the raw artifacts, renamed with the revision.
-    for ARTIFACT in build/bundle/*; do
+    for ARTIFACT in build/*; do
         FILENAME=$(basename "$ARTIFACT")
         EXTENSION="${FILENAME##*.}"
         mv "$ARTIFACT" "artifacts/$REV_NAME.$EXTENSION"

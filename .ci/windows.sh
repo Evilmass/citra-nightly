@@ -3,7 +3,6 @@
 call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
 mkdir build && cd build
 cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 \
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCITRA_USE_BUNDLED_QT=1 \
     -DCITRA_USE_BUNDLED_SDL2=1 \
