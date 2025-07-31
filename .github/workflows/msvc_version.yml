@@ -6,10 +6,9 @@ on:
     branches: [ "*" ]
   workflow_dispatch:
 jobs:
-  test:
+  check_version:
     runs-on: windows-2022
     strategy:
-      fail-fast: false
       matrix:
         toolset_ver:
           - "v141"
@@ -28,7 +27,7 @@ jobs:
       # # https://learn.microsoft.com/cpp/build/reference/help-compiler-command-line-help
 
       - name: Install VS2017 Build Tools (v141)
-        run: ./ci/msvc_version.ps1
+        run: ./.ci/msvc_version.ps1
         shell: pwsh
 
       - run: |
