@@ -14,11 +14,6 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 安装软件
-        shell: powershell
-        run: |
-          choco install 7zip make ccache git -y
-
       - name: 安装 MSVC 2017
         shell: pwsh
         run: |
@@ -44,7 +39,7 @@ jobs:
 
           # 构造安装命令（修正后的语法）
           $componentArgs = ($components | ForEach-Object { "--add $_" }) -join " "
-          $installCmd = ".\vs_buildtools.exe--quiet --norestart  --force --wait --installPath C:\BuildTools $componentArgs"
+          $installCmd = ".\vs_buildtools.exe --quiet --norestart --force --wait --installPath C:\BuildTools $componentArgs"
 
           Write-Host "Running: $installCmd"
           Start-Process -FilePath ".\vs_buildtools.exe" -ArgumentList $installCmd.Split() -Wait -PassThru
@@ -63,7 +58,15 @@ jobs:
 
           Write-Host "Checking msbuild"
           msbuild /?
-        
+
+      - name: Install extra tools (MSVC)
+        run: choco install ccache ninja ptime wget
+
+      - name: Install vulkan-sdk (MSVC)
+        run: |
+          wget https://sdk.lunarg.com/sdk/download/1.4.304.1/windows/VulkanSDK-1.4.304.1-Installer.exe -O D:/a/_temp/vulkan.exe
+          D:/a/_temp/vulkan.exe --accept-licenses --default-answer --confirm-command install
+
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
