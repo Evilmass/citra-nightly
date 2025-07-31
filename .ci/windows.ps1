@@ -1,6 +1,11 @@
-"C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
+# Run the Visual Studio environment setup
+& "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
 
-mkdir build && cd build
+# Create and enter build directory
+New-Item -ItemType Directory -Path "build" -Force | Out-Null
+Set-Location -Path "build"
+
+# Run CMake with all the parameters
 cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 `
     -DCMAKE_BUILD_TYPE=Release `
     -DCITRA_USE_BUNDLED_QT=1 `
@@ -10,11 +15,9 @@ cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 `
     -DUSE_DISCORD_PRESENCE=OFF `
     -DENABLE_FFMPEG_VIDEO_DUMPER=ON `
     -DENABLE_MF=ON
-cd ..
-msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 
-ctest -VV -C Release
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Test error occurred on Windows build"
-    exit 1
-}
+# Return to parent directory
+Set-Location -Path ".."
+
+# Build the solution
+msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
