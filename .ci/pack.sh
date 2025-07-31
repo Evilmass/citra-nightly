@@ -14,17 +14,26 @@ fi
 mkdir -p artifacts
 
 if [ -z "${UPLOAD_RAW}" ]; then
+    # Archive and upload the artifacts.
+    mkdir "$REV_NAME"
+    mv build/bundle/* "$REV_NAME"
+
     if [ "$OS" = "windows" ]; then
-        ARCHIVE_NAME="${REV_NAME}.7z"
-        7z a "$ARCHIVE_NAME" bundle/*
+        ARCHIVE_NAME="${REV_NAME}.zip"
+        # powershell Compress-Archive "$REV_NAME" "$ARCHIVE_NAME"
     else
         ARCHIVE_NAME="${REV_NAME}.tar.gz"
-        tar czvf "$ARCHIVE_NAME" -C bundle .
+        tar czvf "$ARCHIVE_NAME" "$REV_NAME"
     fi
-    mv "$ARCHIVE_NAME" artifacts/
+
+    mv "$REV_NAME" $RELEASE_NAME
+    7z a "$REV_NAME.7z" $RELEASE_NAME
+
+    # mv "$ARCHIVE_NAME" artifacts/
+    mv "$REV_NAME.7z" artifacts/
 else
-    # 直接上传原始文件（按需修改）
-    for ARTIFACT in bundle/*; do
+    # Directly upload the raw artifacts, renamed with the revision.
+    for ARTIFACT in build/*; do
         FILENAME=$(basename "$ARTIFACT")
         EXTENSION="${FILENAME##*.}"
         mv "$ARTIFACT" "artifacts/$REV_NAME.$EXTENSION"
