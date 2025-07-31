@@ -47,17 +47,10 @@ jobs:
       - name: 验证各个组件
         shell: cmd
         run: |
-          Write-Host "Checking vcvarsall"
           call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
-
-          Write-Host "Checking cl"
-          cl /?
-
-          Write-Host "Checking cmake"
-          cmake /?
-
-          Write-Host "Checking msbuild"
-          msbuild /?
+          cl
+          cmake -version
+          msbuild -version
 
       - name: Install extra tools (MSVC)
         run: choco install ccache ninja ptime wget
@@ -66,14 +59,3 @@ jobs:
         run: |
           wget https://sdk.lunarg.com/sdk/download/1.4.304.1/windows/VulkanSDK-1.4.304.1-Installer.exe -O D:/a/_temp/vulkan.exe
           D:/a/_temp/vulkan.exe --accept-licenses --default-answer --confirm-command install
-
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-          toolset: ${{ matrix.toolset_ver }}
-      - run: |
-          "CL_VERSION=$(cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive -SimpleMatch)" | Out-File -Append -FilePath ${env:\GITHUB_OUTPUT}
-        shell: pwsh
-        id: cl
-      - run: echo '::warning ::${{ matrix.os }} + toolset-${{ matrix.toolset_ver }} = ${{ steps.cl.outputs.CL_VERSION }}'
-
