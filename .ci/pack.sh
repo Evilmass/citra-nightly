@@ -16,15 +16,15 @@ mkdir -p artifacts
 if [ -z "${UPLOAD_RAW}" ]; then
     if [ "$OS" = "windows" ]; then
         ARCHIVE_NAME="${REV_NAME}.7z"
-        7z a "$ARCHIVE_NAME" build/bundle/*
+        7z a "$ARCHIVE_NAME" bundle/*
     else
         ARCHIVE_NAME="${REV_NAME}.tar.gz"
-        tar czvf "$ARCHIVE_NAME" -C build/bundle .
+        tar czvf "$ARCHIVE_NAME" -C bundle .
     fi
     mv "$ARCHIVE_NAME" artifacts/
 else
     # 直接上传原始文件（按需修改）
-    for ARTIFACT in build/bundle/*; do
+    for ARTIFACT in bundle/*; do
         FILENAME=$(basename "$ARTIFACT")
         EXTENSION="${FILENAME##*.}"
         mv "$ARTIFACT" "artifacts/$REV_NAME.$EXTENSION"
