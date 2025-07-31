@@ -39,24 +39,33 @@ jobs:
 
           # 构造安装命令（修正后的语法）
           $componentArgs = ($components | ForEach-Object { "--add $_" }) -join " "
-          $installCmd = ".\vs_buildtools.exe --force --quiet --wait --norestart --nocache --installPath C:\BuildTools $componentArgs"
+          $installCmd = ".\vs_buildtools.exe--quiet --norestart  --force --wait --installPath C:\BuildTools $componentArgs"
 
           Write-Host "Running: $installCmd"
           Start-Process -FilePath ".\vs_buildtools.exe" -ArgumentList $installCmd.Split() -Wait -PassThru
 
-      - name: 验证 cl 编译器版本
+      - name: 验证各个组件
         shell: cmd
         run: |
+          Write-Host "Checking vcvarsall"
           call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
+
+          Write-Host "Checking cl"
           cl /?
 
-      # - uses: ilammy/msvc-dev-cmd@v1
-      #   with:
-      #     arch: x64
-      #     toolset: ${{ matrix.toolset_ver }}
-      # # https://learn.microsoft.com/cpp/build/reference/help-compiler-command-line-help
-      # - run: |
-      #     "CL_VERSION=$(cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive -SimpleMatch)" | Out-File -Append -FilePath ${env:\GITHUB_OUTPUT}
-      #   shell: pwsh
-      #   id: cl
-      # - run: echo '::warning ::${{ matrix.os }} + toolset-${{ matrix.toolset_ver }} = ${{ steps.cl.outputs.CL_VERSION }}'
+          Write-Host "Checking cmake"
+          cmake /?
+
+          Write-Host "Checking msbuild"
+          msbuild /?
+        
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+          toolset: ${{ matrix.toolset_ver }}
+      - run: |
+          "CL_VERSION=$(cl /? 2>&1 | Select-String -Pattern 'Compiler Version' -CaseSensitive -SimpleMatch)" | Out-File -Append -FilePath ${env:\GITHUB_OUTPUT}
+        shell: pwsh
+        id: cl
+      - run: echo '::warning ::${{ matrix.os }} + toolset-${{ matrix.toolset_ver }} = ${{ steps.cl.outputs.CL_VERSION }}'
+
