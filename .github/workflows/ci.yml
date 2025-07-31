@@ -61,7 +61,7 @@ jobs:
       - name: Disable line ending translation
         run: git config --global core.autocrlf input
       - name: Build
-        shell: bash
+        shell: pwsh
         run: ./.ci/windows.sh
       - name: Pack
         run: ./.ci/pack.sh
