@@ -44,7 +44,7 @@ jobs:
           cmake -version
           msbuild -version
       - name: Install extra tools (MSVC)
-        run: choco install ccache ninja wget
+        run: choco install ccache ninja wget git
       # - name: Install vulkan-sdk (MSVC)
       #   run: |
       #     wget https://sdk.lunarg.com/sdk/download/1.4.304.1/windows/VulkanSDK-1.4.304.1-Installer.exe -O D:/a/_temp/vulkan.exe
@@ -61,7 +61,7 @@ jobs:
       - name: Disable line ending translation
         run: git config --global core.autocrlf input
       - name: ShellBuild
-        shell: cmd
+        shell: bash
         run: ./.ci/windows.sh
       - name: Build
         shell: pwsh
