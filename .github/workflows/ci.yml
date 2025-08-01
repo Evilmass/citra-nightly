@@ -60,10 +60,12 @@ jobs:
       #   run: glslangValidator --version
       - name: Disable line ending translation
         run: git config --global core.autocrlf input
+      # github actions default repo path: D:/a/<repo><repo>/
       - name: ConfirmBuild
         shell: cmd
         run: |
           call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
+          cd D:/a/citra-nightly/citra-nightly/
           mkdir build && cd build
           cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 ^
             -DCMAKE_BUILD_TYPE=Release ^
@@ -75,7 +77,7 @@ jobs:
             -DENABLE_FFMPEG_VIDEO_DUMPER=ON ^
             -DENABLE_MF=ON
           cd ..
-          msbuild citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+          msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
       # - name: Build
       #   shell: bash
       #   run: ./.ci/windows.sh
