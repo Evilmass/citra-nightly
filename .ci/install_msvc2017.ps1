@@ -13,5 +13,5 @@ $components = @(
 "Microsoft.VisualStudio.Component.Windows10SDK.19041"
 )
 $componentArgs = ($components | ForEach-Object { "--add $_" }) -join " "
-$installCmd = ".\vs_buildtools.exe --quiet --norestart --force --wait $componentArgs"
+$installCmd = ".\vs_buildtools.exe --installPath c:\BuildTools --quiet --norestart --force --wait $componentArgs"
 Start-Process -FilePath ".\vs_buildtools.exe" -ArgumentList $installCmd.Split() -Wait -PassThru

@@ -39,7 +39,7 @@ jobs:
       - name: Check components
         shell: cmd
         run: |
-          cl
+          C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe
           cmake -version
           msbuild -version
       - name: Install extra tools (MSVC)
@@ -63,6 +63,8 @@ jobs:
       - name: ConfirmBuild
         shell: cmd
         run: |
+          call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
+          cd D:/a/citra-nightly/citra-nightly/
           mkdir build && cd build
           cmake .. -G "Visual Studio 15 2017 Win64" ^
             -DCMAKE_BUILD_TYPE=Release ^
