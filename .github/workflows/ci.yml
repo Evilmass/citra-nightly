@@ -44,7 +44,7 @@ jobs:
           msbuild -version
       - name: Install extra tools (MSVC)
         run: choco install ccache ninja wget
-      - name: Install vulkan-sdk (MSVC)
+      # - name: Install vulkan-sdk (MSVC)
       #   run: |
       #     wget https://sdk.lunarg.com/sdk/download/1.4.304.1/windows/VulkanSDK-1.4.304.1-Installer.exe -O D:/a/_temp/vulkan.exe
       #     D:/a/_temp/vulkan.exe --accept-licenses --default-answer --confirm-command install
