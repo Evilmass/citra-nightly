@@ -5,6 +5,7 @@ Write-Error "Failed to download VS Build Tools"
 exit 1
 }
 $components = @(
+"Microsoft.VisualStudio.Workload.MSBuildTools",
 "Microsoft.VisualStudio.Component.Windows10SDK.19041",
 "Microsoft.VisualStudio.Component.VC.v141.x86.x64"
 )
