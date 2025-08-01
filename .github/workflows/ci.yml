@@ -41,7 +41,7 @@ jobs:
         run: |
           C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe
           cmake -version
-          msbuild -version
+          "C:\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" -version
       - name: Install extra tools (MSVC)
         run: choco install ccache ninja wget
       # - name: Install vulkan-sdk (MSVC)
@@ -76,7 +76,7 @@ jobs:
             -DENABLE_FFMPEG_VIDEO_DUMPER=ON ^
             -DENABLE_MF=ON
           cd ..
-          msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+          "C:\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
       # - name: Build
       #   shell: bash
       #   run: ./.ci/windows.sh
