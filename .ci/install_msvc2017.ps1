@@ -6,7 +6,7 @@ exit 1
 }
 $components = @(
 "Microsoft.VisualStudio.Component.Windows10SDK.19041",
-"Microsoft.VisualStudio.Component.VC.v141.x86.x64",
+"Microsoft.VisualStudio.Component.VC.v141.x86.x64"
 )
 $componentArgs = ($components | ForEach-Object { "--add $_" }) -join " "
 $installCmd = ".\vs_buildtools.exe --includeRecommended --quiet --norestart --force --wait --installPath C:\BuildTools $componentArgs"
