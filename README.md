@@ -1,6 +1,9 @@
 dev base off 1543
 
 ```shell
+# vs_buildtools
+vs2017_BuildTools.exe --installPath C:\BuildTools --add Microsoft.VisualStudio.Workload.MSBuildTools --add Microsoft. VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.Windows10SDK.19041
+
 # git bash
 git clone -b dev --recursive https://github.com/Evilmass/citra-nightly.git
 
@@ -20,6 +23,17 @@ AutoGen error
 
          系统找不到指定的批处理标签 - VCEnd
     64>C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Microsoft\VC\v150\Microsoft.CppCommon.targets(195,5): error MSB6006: “cmd.exe”已退出，代码
+
+# https://productionresultssa12.blob.core.windows.net/actions-results/bdf0a9d4-3f88-45e2-a5e0-a8e189c6040f/workflow-job-run-80838dcf-3474-532f-9647-d9f8a03a6115/logs/job/job-logs.txt?rsct=text%2Fplain&se=2025-08-01T05%3A39%3A10Z&sig=ka8VhN%2F4sj3oNM9tjKCzax8qiMy7PiUEzEqhjKPiqao%3D&ske=2025-08-01T14%3A45%3A58Z&skoid=ca7593d4-ee42-46cd-af88-8b886a2f84eb&sks=b&skt=2025-08-01T02%3A45%3A58Z&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skv=2025-05-05&sp=r&spr=https&sr=b&st=2025-08-01T05%3A29%3A05Z&sv=2025-05-05
+2025-08-01T04:24:48.6426075Z     63>CustomBuild:
+2025-08-01T04:24:48.6426915Z          1>Automatic MOC and UIC for target citra-qt
+2025-08-01T04:24:48.6656222Z          
+2025-08-01T04:24:48.6666222Z          AutoGen error
+2025-08-01T04:24:48.6670475Z          -------------
+2025-08-01T04:24:48.6674128Z          Info error in info file
+2025-08-01T04:24:48.6675699Z          "D:/a/citra-nightly/citra-nightly/build/src/citra_qt/CMakeFiles/citra-qt_autogen.dir/AutogenInfo.json":
+2025-08-01T04:24:48.6688161Z          The source file "SRC:/build/src/citra_qt/qrc_languages.cpp" does not exist.
+2025-08-01T04:24:48.6689525Z          
 ```
 
 
