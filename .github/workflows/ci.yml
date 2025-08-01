@@ -39,11 +39,10 @@ jobs:
       - name: Check components
         shell: cmd
         run: |
-          C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe
+          C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat x64
+          cl
           cmake -version
-          "C:\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" -version
-      - name: Install extra tools (MSVC)
-        run: choco install ccache ninja wget
+          msbuild -version
       # - name: Install vulkan-sdk (MSVC)
       #   run: |
       #     wget https://sdk.lunarg.com/sdk/download/1.4.304.1/windows/VulkanSDK-1.4.304.1-Installer.exe -O D:/a/_temp/vulkan.exe
@@ -63,7 +62,7 @@ jobs:
       - name: ConfirmBuild
         shell: cmd
         run: |
-          call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
+          C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat x64
           cd D:/a/citra-nightly/citra-nightly/
           mkdir build && cd build
           cmake .. -G "Visual Studio 15 2017 Win64" ^
@@ -76,13 +75,8 @@ jobs:
             -DENABLE_FFMPEG_VIDEO_DUMPER=ON ^
             -DENABLE_MF=ON
           cd ..
-          "C:\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
-      # - name: Build
-      #   shell: bash
-      #   run: ./.ci/windows.sh
-      # - name: Pack
-      #   run: ./.ci/pack.sh
-      - name: BashPack
+          msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+      - name: Pack
         shell: bash
         run: |
           GITDATE="`git show -s --date=short --format='%ad' | sed 's/-//g'`"
@@ -90,8 +84,8 @@ jobs:
           REV_NAME="citra-${OS}-${TARGET}-${GITDATE}-${GITREV}"
           RELEASE_NAME=head
           mkdir -p artifacts
-          ls build/bin/Release/x64/*
-          find build/bin/Release/x64/* -name "*.mv" ! -name "*.pdb" ! -name "tests.exe" -exec mv {} "$RELEASE_NAME" \;
+          ls D:/a/citra-nightly/citra-nightly/build/bin/Release/x64/*
+          find D:/a/citra-nightly/citra-nightly/build/bin/Release/x64/* -name "*.mv" ! -name "*.pdb" ! -name "tests.exe" -exec mv {} "$RELEASE_NAME" \;
           7z a "$REV_NAME.7z" $RELEASE_NAME
           mv "$REV_NAME.7z" artifacts/
       - name: Upload

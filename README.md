@@ -58,35 +58,3 @@ CMakeModules\GenerateSCMRev.cmake
 AppVeyor
 ==============
 [citra-nightly-AppVeyor](https://ci.appveyor.com/project/Evilmass/citra-nightly)
-
-
-ninjia
-==============
-```shell
-# 只用设置 cmake ccache ninja 环境变量
-
-C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat x64
-
-mkdir build && cd build
-
-cmake .. --fresh -G Ninja ^
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
-    -DCMAKE_BUILD_TYPE=Release ^
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache ^
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ^
-    -DCITRA_USE_BUNDLED_QT=1 ^
-    -DCITRA_USE_BUNDLED_SDL2=1 ^
-    -DENABLE_QT_TRANSLATION=ON ^
-    -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF ^
-    -DUSE_DISCORD_PRESENCE=OFF ^
-    -DENABLE_FFMPEG_VIDEO_DUMPER=ON ^
-    -DENABLE_MF=ON
-
-ninja
-ninja bundle
-strip -s bundle/*.exe
-
-ccache -s -v
-
-ctest -VV -C Release || echo "::error ::Test error occurred on Windows build"
-```
