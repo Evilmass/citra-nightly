@@ -40,7 +40,7 @@ jobs:
         shell: cmd
         run: |
           call "C:\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
-          cl
+          C:\BuildTools\VC\Tools\MSVC\14.16.27023\bin\HostX86\x64\cl.exe
           cmake -version
           msbuild -version
       # - name: Install extra tools (MSVC)
