@@ -74,6 +74,7 @@ mkdir build && cd build
 
 
 cmake .. -G Ninja ^
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DCMAKE_C_COMPILER_LAUNCHER=ccache ^
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ^
