@@ -26,25 +26,27 @@ mscv build
 <!-- https://www.doxygen.nl/files/doxygen-1.14.0.windows.x64.bin.zip -->
 
 ```shell
-# git bash
-git clone -b 1671 --recursive https://github.com/Evilmass/citra-nightly.git
+git clone -b 1671 --recursive https://github.com/Evilmass/citra-nightly
 
-# cmake
-mkdir msvc_build && cd msvc_build
-# VS2017
-# cmake .. -G "Visual Studio 15 2017 Win64"
-cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_GENERATOR_TOOLSET=v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
-cd ..
-
-## 若你仅修改了源代码，而没有改变 CMakeLists.txt 文件，可以跳过 CMake 配置步骤，直接重新编译。
-# rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
-
-# build
-"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe"
-msbuild msvc_build/citra.sln /m /p:Configuration=Release,Platform=x64 /t:Rebuild
+# msvc 2017
+mkdir build
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DENABLE_QT_TRANSLATION=OFF -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF
+msbuild build/citra.sln -m -p:Configuration=Release,Platform=x64 -t:Rebuild
 
 # pack
-bash pack.sh
+bash pack.sh build/
+```
+
+## Note
+```shell
+# aqtinstall
+aqt.exe install-qt windows desktop 5.10.0 win64_msvc2017_64 -m qtmultimedia --outputdir ./qt-5.10.0-msvc2017_64 # qttranslations
+
+# github actions shell permission denied
+git update-index --chmod=+x .ci\source.sh
+git update-index --chmod=+x .ci\windows.sh
+git commit -m "Fix: Add execute permission to source.sh and windows.sh"
+git push
 ```
 
 **BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
