@@ -191,7 +191,7 @@ void OpenGLWindow::exposeEvent(QExposeEvent* event) {
 GRenderWindow::GRenderWindow(QWidget* parent_, EmuThread* emu_thread)
     : QWidget(parent_), emu_thread(emu_thread) {
 
-    setWindowTitle(QStringLiteral("%1 | %2-%3")
+    setWindowTitle(QStringLiteral("Citra %1 | %2-%3")
                        .arg(QString::fromUtf8(Common::g_build_name),
                             QString::fromUtf8(Common::g_scm_branch),
                             QString::fromUtf8(Common::g_scm_desc)));

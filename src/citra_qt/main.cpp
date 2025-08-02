@@ -2321,7 +2321,7 @@ void GMainWindow::UpdateWindowTitle() {
     if (game_title.isEmpty()) {
         setWindowTitle(tr("%1 ").arg(full_name));
     } else {
-        setWindowTitle(tr("%1 | %2").arg(full_name, game_title));
+        setWindowTitle(tr("Citra %1 | %2").arg(full_name, game_title));
     }
 }
 

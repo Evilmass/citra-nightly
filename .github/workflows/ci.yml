@@ -1,0 +1,85 @@
+name: citra-build
+
+on:
+  push:
+    branches: [ "1543" ]
+  workflow_dispatch:
+jobs:
+  source:
+    if: ${{ !github.head_ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Pack
+        run: ./.ci/source.sh
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: source
+          path: artifacts/
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildcache
+          key: ${{ runner.os }}-win-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-win-
+      - name: install MSVC 2017
+        shell: pwsh
+        run: ./.ci/install_msvc2017.ps1
+      # - name: Install extra tools (MSVC)
+      #   run: choco install wget ccache ninja
+      # - name: Install vulkan-sdk (MSVC)
+      #   run: |
+      #     wget https://sdk.lunarg.com/sdk/download/1.4.304.1/windows/VulkanSDK-1.4.304.1-Installer.exe -O D:/a/_temp/vulkan.exe
+      #     D:/a/_temp/vulkan.exe --accept-licenses --default-answer --confirm-command install
+      # - name: Setup Vulkan SDK
+      #   uses: humbletim/setup-vulkan-sdk@v1.2.1
+      #   with:
+      #     vulkan-query-version: 1.4.304.1
+      #     vulkan-components: Glslang, Vulkan-Headers, SPIRV-Tools
+      #     vulkan-use-cache: true
+      # - name: Test glslangValidator
+      #   run: glslangValidator --version
+      - name: Disable line ending translation
+        run: git config --global core.autocrlf input
+      - name: Build
+        shell: bash
+        run: ./.ci/windows.sh
+      - name: Pack
+        shell: bash
+        run: ./.ci/pack.sh
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-msvc
+          path: artifacts/
+  release:
+    runs-on: ubuntu-latest
+    needs: [windows, source]
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    steps:
+      - uses: actions/download-artifact@v4
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+      - name: Upload artifacts
+        uses: alexellis/upload-assets@0.4.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["./**/*.tar.*","./**/*.AppImage","./**/*.7z","./**/*.zip","./**/*.apk","./**/*.aab"]'

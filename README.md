@@ -41,7 +41,6 @@ Inspired by
 4. Update default.ini: `web_api_url`, disable telemetry
 5. Add submodule `dist/compatibility_list`
 6. Fix appveyor.yml: only build MSVC
-7. Rename main title: `citra-mhxx`
 
 ### v1.1.0
 
@@ -60,6 +59,7 @@ Inspired by
   `Windows 10 SDK (10.0.19041.0) + MSVC v141 VS2017 C++ x64-86 BuildTools (v14.16.27023)`
 - [Git](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
 - [CMake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
+- [ccache](https://github.com/ccache/ccache/releases/download/v4.11.3/ccache-4.11.3-windows-x86_64.zip)
 - [7-Zip](https://www.7-zip.org/a/7z2500-x64.exe)
 
 ---
@@ -68,25 +68,20 @@ Inspired by
 
 ```sh
 # git-bash --login -i
-git clone -b mhxx --recursive https://github.com/Evilmass/citra-nightly.git
+git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
 
 # cmake
-mkdir v1.1.0_build && cd v1.1.0_build
-# VS 2022 → toolset 141 → MSVC 2017
-cmake .. --fresh -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
-# VS 2017
-# cmake .. -G "Visual Studio 15 2017 Win64"
-cd ..
+mkdir build && cd build
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ONcd ..
 
 # If you did not modify CMakeLists.txt, skip CMake configuration and recompile directly
 # rm -rf ./CMakeFiles/ && rm -f ./CMakeCache.txt
 
 # build
-rm -rf v1.1.0_build/bin
-msbuild v1.1.0_build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 
 # pack
-bash pack.sh
+bash pack.sh build/
 ```
 
 ---
@@ -94,3 +89,17 @@ bash pack.sh
 ## AppVeyor
 
 Full build logs: [https://ci.appveyor.com/project/Evilmass/citra-nightly](https://ci.appveyor.com/project/Evilmass/citra-nightly)
+
+
+## Note
+```shell
+# aqtinstall
+aqt.exe install-qt windows desktop 5.10.0 win64_msvc2017_64 -m qtmultimedia --outputdir ./qt-5.10.0-msvc2017_64 # qttranslations
+
+# github actions shell permission denied
+git update-index --chmod=+x ./.ci/source.sh
+git update-index --chmod=+x ./.ci/pack.sh
+git update-index --chmod=+x ./.ci/windows.sh
+git commit -m "Fix: Add execute permission to source.sh and windows.sh"
+git push
+```
