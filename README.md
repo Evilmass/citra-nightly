@@ -43,21 +43,26 @@ VulkanSDK-1.4.304.1-Installer.exe --accept-licenses --default-answer --confirm-c
 
 ```shell
 git clone -b 1671 --recursive https://github.com/Evilmass/citra-nightly
-mkdir build && cd build
 
-# msvc 2019
-cmake .. -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_BUILD_TYPE=Release -DENABLE_QT_TRANSLATION=ON -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF
-cd ..
+# msvc 2017
+mkdir build
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DENABLE_QT_TRANSLATION=OFF -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF
 msbuild build/citra.sln -m -p:Configuration=Release,Platform=x64 -t:Rebuild
 
 # pack
 bash pack.sh build/
 ```
 
-## note
+## Note
 ```shell
 # aqtinstall
 aqt.exe install-qt windows desktop 5.10.0 win64_msvc2017_64 -m qtmultimedia --outputdir ./qt-5.10.0-msvc2017_64 # qttranslations
+
+# github actions shell permission denied
+git update-index --chmod=+x .ci\source.sh
+git update-index --chmod=+x .ci\windows.sh
+git commit -m "Fix: Add execute permission to source.sh and windows.sh"
+git push
 ```
 
 **BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
