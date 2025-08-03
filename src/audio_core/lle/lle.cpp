@@ -146,7 +146,7 @@ struct DspLle::Impl final {
     std::size_t stop_generation;
 
     static constexpr u32 DspDataOffset = 0x40000;
-    static constexpr u32 TeakraSlice = 16384;
+    static constexpr u32 TeakraSlice = 20000;
 
     void TeakraThread() {
         while (true) {

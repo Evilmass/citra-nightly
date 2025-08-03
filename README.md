@@ -4,9 +4,11 @@ dev
 Jun 12, 2020
 - Merge pull request #5273 from xperia64/frame_timing_tweak
     Update FPS to roughly match the actual 3DS rate
+    16913feb4441ffba1a57347953a8a6aa0103e5c5
 
 May 13, 2020
 - Improve core timing accuracy (#5257)
+    57aa18f52ea35ca74cd1a6c406a4abf04049b44e
 
 Aug 22, 2020
 - fix order
