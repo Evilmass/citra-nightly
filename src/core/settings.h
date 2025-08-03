@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 #include "common/common_types.h"
-#include "core/hle/service/cam/cam.h"
+#include "core/hle/service/cam/cam_params.h"
 
 namespace Settings {
 
@@ -155,8 +155,9 @@ struct Values {
     bool shaders_accurate_mul;
     bool use_shader_jit;
     u16 resolution_factor;
-    bool use_frame_limit;
+    bool use_frame_limit_alternate;
     u16 frame_limit;
+    u16 frame_limit_alternate;
     std::string texture_filter_name;
 
     LayoutOption layout_option;

@@ -172,9 +172,7 @@ bool OpenGLWindow::event(QEvent* event) {
     case QEvent::Drop:
         GetMainWindow()->DropAction(static_cast<QDropEvent*>(event));
         return true;
-    case QEvent::DragResponse:
     case QEvent::DragEnter:
-    case QEvent::DragLeave:
     case QEvent::DragMove:
         GetMainWindow()->AcceptDropEvent(static_cast<QDropEvent*>(event));
         return true;
@@ -266,7 +264,7 @@ QByteArray GRenderWindow::saveGeometry() {
 }
 
 qreal GRenderWindow::windowPixelRatio() const {
-    return devicePixelRatio();
+    return devicePixelRatioF();
 }
 
 std::pair<u32, u32> GRenderWindow::ScaleTouch(const QPointF pos) const {
@@ -334,7 +332,7 @@ void GRenderWindow::TouchUpdateEvent(const QTouchEvent* event) {
     int active_points = 0;
 
     // average all active touch points
-    for (const auto tp : event->touchPoints()) {
+    for (const auto& tp : event->touchPoints()) {
         if (tp.state() & (Qt::TouchPointPressed | Qt::TouchPointMoved | Qt::TouchPointStationary)) {
             active_points++;
             pos += tp.pos();

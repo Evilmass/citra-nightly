@@ -228,7 +228,8 @@ static constexpr int SettingsToSlider(int value) {
     return (value - 5) / 5;
 }
 
-ConfigureSystem::ConfigureSystem(QWidget* parent) : QWidget(parent), ui(new Ui::ConfigureSystem) {
+ConfigureSystem::ConfigureSystem(QWidget* parent)
+    : QWidget(parent), ui(std::make_unique<Ui::ConfigureSystem>()) {
     ui->setupUi(this);
     connect(ui->combo_birthmonth,
             static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
@@ -243,6 +244,10 @@ ConfigureSystem::ConfigureSystem(QWidget* parent) : QWidget(parent), ui(new Ui::
             ui->combo_country->addItem(tr(country_names.at(i)), i);
         }
     }
+
+    // Set a minimum width for the label to prevent the slider from changing size.
+    // This scales across DPIs. (This value should be enough for "xxx%")
+    ui->clock_display_label->setMinimumWidth(40);
 
     connect(ui->slider_clock_speed, &QSlider::valueChanged, [&](int value) {
         ui->clock_display_label->setText(QStringLiteral("%1%").arg(SliderToSettings(value)));

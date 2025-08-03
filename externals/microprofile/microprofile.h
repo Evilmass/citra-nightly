@@ -927,7 +927,11 @@ typedef HANDLE MicroProfileThread;
 DWORD _stdcall ThreadTrampoline(void* pFunc)
 {
     MicroProfileThreadFunc F = (MicroProfileThreadFunc)pFunc;
-    return (uint32_t)F(0);
+
+    // The return value of F will always return a void*, however, this is for
+    // compatibility with pthreads. The underlying "address" of the pointer
+    // is always a 32-bit value, so this cast is safe to perform.
+    return static_cast<DWORD>(reinterpret_cast<uint64_t>(F(0)));
 }
 
 void MicroProfileThreadStart(MicroProfileThread* pThread, MicroProfileThreadFunc Func)
@@ -1018,7 +1022,7 @@ static void MicroProfileCreateThreadLogKey()
 #else
 MP_THREAD_LOCAL MicroProfileThreadLog* g_MicroProfileThreadLog = 0;
 #endif
-static bool g_bUseLock = false; /// This is used because windows does not support using mutexes under dll init(which is where global initialization is handled)
+static std::atomic<bool> g_bUseLock{false}; /// This is used because windows does not support using mutexes under dll init(which is where global initialization is handled)
 
 
 MICROPROFILE_DEFINE(g_MicroProfileFlip, "MicroProfile", "MicroProfileFlip", 0x3355ee);
