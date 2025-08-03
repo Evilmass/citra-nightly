@@ -1,6 +1,7 @@
 # Build directory
 [Bb]uild/
 doc-build/
+head/
 head_*/
 citra-windows*.7z
 
