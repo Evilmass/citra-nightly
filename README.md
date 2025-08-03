@@ -1,5 +1,7 @@
 dev
 - base {"cb44e4408d5e3fd6ec4f7c39c51aa094389408ba", "nightly-1571"}
+- merge before [Use GitHub Actions as CI service (#5602)](https://github.com/Evilmass/citra-nightly/commit/0133ebe0bcbe867eb7f45f58b7826b583ec6fb2c)
+    还是过段时间卡一阵子
 
 Jun 12, 2020
 - Merge pull request #5273 from xperia64/frame_timing_tweak
@@ -20,6 +22,7 @@ Aug 22, 2020
 build
 ```shell
 cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_SYSTEM_VERSION=10.0.14393.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+rm -rf build/bin
 msbuild build/citra.sln -m -p:Configuration=Release,Platform=x64 -t:Rebuild
 ```
 
