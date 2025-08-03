@@ -2,6 +2,7 @@ dev
 - base {"cb44e4408d5e3fd6ec4f7c39c51aa094389408ba", "nightly-1571"}
 - merge before [Use GitHub Actions as CI service (#5602)](https://github.com/Evilmass/citra-nightly/commit/0133ebe0bcbe867eb7f45f58b7826b583ec6fb2c)
     还是过段时间卡一阵子
+- 改 MAX_SLICE_LENGTH 没用
 
 Jun 12, 2020
 - Merge pull request #5273 from xperia64/frame_timing_tweak
