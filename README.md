@@ -1,3 +1,17 @@
+dev
+- base {"cb44e4408d5e3fd6ec4f7c39c51aa094389408ba", "nightly-1571"}
+
+Jun 12, 2020
+- Merge pull request #5273 from xperia64/frame_timing_tweak
+    Update FPS to roughly match the actual 3DS rate
+
+May 13, 2020
+- Improve core timing accuracy (#5257)
+
+Aug 22, 2020
+- fix order
+    action_Save_to_Oldest_Slot 07d2daf
+
 **BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
 
 Citra
