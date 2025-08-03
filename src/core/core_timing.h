@@ -171,7 +171,7 @@ public:
         BOOST_SERIALIZATION_SPLIT_MEMBER()
     };
 
-    static constexpr int MAX_SLICE_LENGTH = 20000;
+    static constexpr int MAX_SLICE_LENGTH = 10000;
 
     class Timer {
     public:
