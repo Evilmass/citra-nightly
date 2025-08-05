@@ -224,7 +224,7 @@ find_package(Threads REQUIRED)
 
 if (ENABLE_QT)
     if (NOT USE_SYSTEM_QT)
-        download_qt(6.5.1)
+        download_qt(6.7.2)
     endif()
 
     find_package(Qt6 REQUIRED COMPONENTS Widgets Multimedia Concurrent)
@@ -273,7 +273,7 @@ endif()
 # against all the src files. This should be used before making a pull request.
 # =======================================================================
 
-set(CLANG_FORMAT_POSTFIX "-12")
+set(CLANG_FORMAT_POSTFIX "-15")
 find_program(CLANG_FORMAT
     NAMES clang-format${CLANG_FORMAT_POSTFIX}
           clang-format
@@ -284,7 +284,7 @@ if (NOT CLANG_FORMAT)
         message(STATUS "Clang format not found! Downloading...")
         set(CLANG_FORMAT "${PROJECT_BINARY_DIR}/externals/clang-format${CLANG_FORMAT_POSTFIX}.exe")
         file(DOWNLOAD
-            https://github.com/citra-emu/ext-windows-bin/raw/master/clang-format${CLANG_FORMAT_POSTFIX}.exe
+            https://github.com/Evilmass/ext-win-bin/raw/main/clang-format${CLANG_FORMAT_POSTFIX}.exe
             "${CLANG_FORMAT}" SHOW_PROGRESS
             STATUS DOWNLOAD_SUCCESS)
         if (NOT DOWNLOAD_SUCCESS EQUAL 0)

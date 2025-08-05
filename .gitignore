@@ -2,6 +2,8 @@
 [Bb]uild*/
 doc-build/
 build-*/
+head/
+head*/
 
 # Generated source files
 src/common/scm_rev.cpp

@@ -1,3 +1,18 @@
+[add vulkan](dfa2fd0e0de74dea2f984beef4d847da5e18ab43)
+
+```shell
+git clone -b vulkan --recursive https://github.com/Evilmass/citra-nightly
+
+# msvc 2017
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v142 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DENABLE_QT_TRANSLATION=OFF -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF
+rm -rf build/bin
+msbuild build/citra.sln -m -p:Configuration=Release,Platform=x64 -t:Rebuild
+
+# pack
+bash pack.sh build/
+```
+
+
 <h1 align="center">
   <br>
   <a href="https://citra-emu.org/"><img src="https://raw.githubusercontent.com/citra-emu/citra-assets/master/Main/citra_logo.svg" alt="Citra" width="200"></a>
