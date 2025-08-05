@@ -57,11 +57,6 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.target }}-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.target }}-
-      - name: Increase Pagefile size
-        uses: al-cheb/configure-pagefile-action@v1.2
-        with:
-          minimum-size: 2GB
-          maximum-size: 6GB
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
       - name: Install extra tools (MSVC)
@@ -69,8 +64,8 @@ jobs:
       - name: Set up Vulkan SDK (MSVC)
         uses: humbletim/setup-vulkan-sdk@v1.2.1
         with:
-          vulkan-query-version: latest
-          vulkan-components: Glslang
+          vulkan-query-version: 1.4.304.1
+          vulkan-components: SPIRV-Tools, Glslang
           vulkan-use-cache: true
       - name: Test glslang
         run: glslang --version || glslangValidator --version
