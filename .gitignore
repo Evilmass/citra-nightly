@@ -4,6 +4,7 @@
 doc-build/
 head/
 *_head/
+head*/
 citra-windows*.7z
 
 # Generated source files
