@@ -67,11 +67,13 @@ function(download_qt target)
 
     if (NOT EXISTS "${prefix}")
         message(STATUS "Downloading binaries for Qt...")
+        set(aqt_path "${base_path}/aqt.exe")
         if (WIN32)
-            set(aqt_path "${base_path}/aqt.exe")
-            file(DOWNLOAD
-                https://github.com/miurahr/aqtinstall/releases/download/v3.1.7/aqt.exe
-                ${aqt_path} SHOW_PROGRESS)
+            if (NOT EXISTS "${aqt_path}")
+                file(DOWNLOAD
+                    https://github.com/miurahr/aqtinstall/releases/download/v3.1.7/aqt.exe
+                    ${aqt_path} SHOW_PROGRESS)
+            endif()
             execute_process(COMMAND ${aqt_path} ${install_args}
                     WORKING_DIRECTORY ${base_path})
         else()
