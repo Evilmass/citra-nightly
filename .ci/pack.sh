@@ -36,7 +36,7 @@ function pack_artifacts() {
     # Create .zip/.tar.gz
     if [ "$OS" = "windows" ]; then
         ARCHIVE_FULL_NAME="$ARCHIVE_NAME.zip"
-        powershell Compress-Archive "$REV_NAME" "$ARCHIVE_FULL_NAME"
+        # powershell Compress-Archive "$REV_NAME" "$ARCHIVE_FULL_NAME"
     elif [ "$OS" = "android" ]; then
         ARCHIVE_FULL_NAME="$ARCHIVE_NAME.zip"
         zip -r "$ARCHIVE_FULL_NAME" "$REV_NAME"
@@ -44,12 +44,13 @@ function pack_artifacts() {
         ARCHIVE_FULL_NAME="$ARCHIVE_NAME.tar.gz"
         tar czvf "$ARCHIVE_FULL_NAME" "$REV_NAME"
     fi
-    mv "$ARCHIVE_FULL_NAME" artifacts/
+    # mv "$ARCHIVE_FULL_NAME" artifacts/
 
     if [ -z "$SKIP_7Z" ]; then
         # Create .7z
         ARCHIVE_FULL_NAME="$ARCHIVE_NAME.7z"
         mv "$REV_NAME" "$RELEASE_NAME"
+        mkdir -p "$RELEASE_NAME"/user
         7z a "$ARCHIVE_FULL_NAME" "$RELEASE_NAME"
         mv "$ARCHIVE_FULL_NAME" artifacts/
 
