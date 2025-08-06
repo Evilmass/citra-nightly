@@ -73,7 +73,7 @@ TEST_CASE("DSP LLE vs HLE", "[audio_core][hle]") {
             do {
                 lle_core_timing.GetTimer(0)->AddTicks(lle_core_timing.GetTimer(0)->GetDowncount());
                 lle_core_timing.GetTimer(0)->Advance();
-                lle_core_timing.GetTimer(0)->SetNextSlice();
+                // lle_core_timing.GetTimer(0)->SetNextSlice();
             } while (lle.GetPipeReadableSize(AudioCore::DspPipe::Audio) == 0);
 
             REQUIRE(lle.GetPipeReadableSize(AudioCore::DspPipe::Audio) >= 32);
@@ -124,7 +124,7 @@ TEST_CASE("DSP LLE vs HLE", "[audio_core][hle]") {
         do {
             lle_core_timing.GetTimer(0)->AddTicks(lle_core_timing.GetTimer(0)->GetDowncount());
             lle_core_timing.GetTimer(0)->Advance();
-            lle_core_timing.GetTimer(0)->SetNextSlice();
+            // lle_core_timing.GetTimer(0)->SetNextSlice();
         } while (lle.GetPipeReadableSize(AudioCore::DspPipe::Binary) == 0);
 
         REQUIRE(lle.GetPipeReadableSize(AudioCore::DspPipe::Binary) >= 32);
