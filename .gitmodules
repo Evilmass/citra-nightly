@@ -85,3 +85,6 @@
 [submodule "libadrenotools"]
     path = externals/libadrenotools
     url = https://github.com/bylaws/libadrenotools
+[submodule "dist/compatibility_list"]
+	path = dist/compatibility_list
+	url = https://github.com/Evilmass/compatibility-list
