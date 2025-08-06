@@ -264,7 +264,7 @@ GMainWindow::GMainWindow(Core::System& system_)
     game_list->PopulateAsync(UISettings::values.game_dirs);
 
     // Show one-time "callout" messages to the user
-    ShowTelemetryCallout();
+    // ShowTelemetryCallout();
 
     mouse_hide_timer.setInterval(default_mouse_timeout);
     connect(&mouse_hide_timer, &QTimer::timeout, this, &GMainWindow::HideMouseCursor);
