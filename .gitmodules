@@ -91,3 +91,6 @@
 [submodule "oaknut"]
 	path = externals/oaknut
 	url = https://github.com/Evilmass/oaknut.git
+[submodule "dist/compatibility_list"]
+	path = dist/compatibility_list
+	url = https://github.com/Evilmass/compatibility-list
