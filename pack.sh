@@ -15,4 +15,4 @@ cp -r "$BUILD_DIR/bin/Release"/* ./license.txt ./README.md "$RELEASE_DIST/"
 find "$RELEASE_DIST" -type f \( -iname '*.pdb' -o -iname 'tests.exe' \) -delete
 
 [ -f "$MSVC_SEVENZIP" ] && rm -f "$MSVC_SEVENZIP"
-7z a "$MSVC_SEVENZIP" "$RELEASE_DIST"
+# 7z a "$MSVC_SEVENZIP" "$RELEASE_DIST"
