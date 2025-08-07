@@ -5,9 +5,7 @@ mkdir -p build
 cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -T v142 \
     -DCMAKE_SYSTEM_VERSION=10.0.19041.0 \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-    -DUSE_CCACHE=ON \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_TOOLCHAIN_FILE="$(pwd)/../CMakeModules/MSVCCache.cmake" \
     -DCITRA_USE_BUNDLED_QT=1 \
     -DCITRA_USE_BUNDLED_SDL2=1 \
     -DENABLE_QT_TRANSLATION=OFF \
