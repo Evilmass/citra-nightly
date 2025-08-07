@@ -2,7 +2,7 @@
 set -e
 
 mkdir -p build
-cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -T v141 \
+cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -T v142 \
     -DCMAKE_SYSTEM_VERSION=10.0.19041.0 \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DUSE_CCACHE=ON \
