@@ -1,6 +1,8 @@
 # Build directory
 [Bb]uild/
 doc-build/
+head/
+citra-windows*.7z
 
 # Generated source files
 src/common/scm_rev.cpp
