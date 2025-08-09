@@ -1,9 +1,14 @@
 2104_ticks
 ============
 
+原始版本，官方掉速
+原始版本 + frame_ticks = 掉57，过段时间掉速
+原始版本 + raise_cpu_ticks(1w6) = 掉 57
+raise_cpu_ticks + frame_ticks = 掉 57
+
 ```shell
 set VULKAN_SDK=
-cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v143 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_QT_TRANSLATION=ON -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v143 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_QT_TRANSLATION=ON -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF
 msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
 ```
 
