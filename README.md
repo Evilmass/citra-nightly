@@ -1,11 +1,13 @@
 bass off [Add vulkan backend (#6512)](dfa2fd0e0de74dea2f984beef4d847da5e18ab43)
 
-加 raise_cpu_ticks 会跳帧，模拟速度不稳定
-
 1. revert [Improve core timing accuracy (#5257)](57aa18f52ea35ca74cd1a6c406a4abf04049b44e)
-2. 不需要 revert [Update FPS to roughly match the actual 3DS rate](16913feb4441ffba1a57347953a8a6aa0103e5c5)
+2. dont revert [Update FPS to roughly match the actual 3DS rate](16913feb4441ffba1a57347953a8a6aa0103e5c5)
 3. remove NextSlice
 4. update frame_ticks, `(268,111,856) / (4,468,531) = 59.99999910485123Hz`
+
+测试
+- 加 raise_cpu_ticks 会跳帧，模拟速度不稳定
+- SCREEN_REFRESH_RATE 超过 60 fps 会撕裂
 
 ```shell
 git clone -b vulkan --recursive https://github.com/Evilmass/citra-nightly
