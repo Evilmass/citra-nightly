@@ -4,6 +4,8 @@ doc-build/
 build-*/
 head/
 head*/
+ninja_build/
+citra-windows*.7z
 
 # Generated source files
 src/common/scm_rev.cpp
