@@ -26,7 +26,10 @@ constexpr u64 frame_ticks = 4468531ull;
 
 // Refresh rate defined by ratio of ARM11 frequency to ARM11 ticks per frame
 // (268,111,856) / (4,481,136) = 59.83122493939037Hz
+// (268,111,856) / (4,473,003) = 59.94001255979484Hz
 // (268,111,856) / (4,468,531) = 59.99999910485123Hz
+// (268,111,856) / (4,468,530) = 60.00001253208549Hz
+
 constexpr double SCREEN_REFRESH_RATE = BASE_CLOCK_RATE_ARM11 / static_cast<double>(frame_ticks);
 
 // Returns index corresponding to the Regs member labeled by field_name
