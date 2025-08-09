@@ -1,3 +1,13 @@
+dev
+
+```shell
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -T v142 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCITRA_USE_BUNDLED_QT=1 -DENABLE_QT_TRANSLATION=OFF -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=ON -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
+# -DOPENSSL_DLL_DIR="C:\Program Files\OpenSSL\bin"
+msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+buildcache -s
+ctest -VV -C Release || echo "::error ::Test error occurred on Windows MSVC build"
+```
+
 <h1 align="center">
   <br>
   <a href="https://citra-emu.org/"><img src="https://raw.githubusercontent.com/citra-emu/citra-assets/master/Main/citra_logo.svg" alt="Citra" width="200"></a>
