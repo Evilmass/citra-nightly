@@ -1,5 +1,7 @@
 1782 bass off [Merge pull request #6108 from SachinVin/andy](d38098051d74d19b4b198fcaef7465cedb984fd4)
 
+最后一个支持 OpenGl 3.3 的版本，和 1671 类似，过段时间小掉速
+
 1. revert [Improve core timing accuracy (#5257)](57aa18f52ea35ca74cd1a6c406a4abf04049b44e)
 2. dont revert [Update FPS to roughly match the actual 3DS rate](16913feb4441ffba1a57347953a8a6aa0103e5c5)
 3. remove NextSlice
