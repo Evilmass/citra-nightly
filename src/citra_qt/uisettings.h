@@ -86,7 +86,7 @@ struct Values {
     Settings::Setting<bool> check_for_update_on_start{true, "check_for_update_on_start"};
 
     // Discord RPC
-    Settings::Setting<bool> enable_discord_presence{true, "enable_discord_presence"};
+    Settings::Setting<bool> enable_discord_presence{false, "enable_discord_presence"};
 
     // Game List
     Settings::Setting<GameListIconSize> game_list_icon_size{GameListIconSize::LargeIcon,
