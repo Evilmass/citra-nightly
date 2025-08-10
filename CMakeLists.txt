@@ -192,8 +192,8 @@ find_package(Threads REQUIRED)
 
 if (ENABLE_QT)
     if (CITRA_USE_BUNDLED_QT)
-        if (MSVC_VERSION GREATER_EQUAL 1920 AND "x86_64" IN_LIST ARCHITECTURE)
-            set(QT_VER qt-5.15.7-msvc2019_64)
+        if (MSVC_VERSION GREATER_EQUAL 1920)
+            set(QT_VER qt-5.15.0-msvc2019_64)
         else()
             message(FATAL_ERROR "No bundled Qt binaries for your toolchain. Disable CITRA_USE_BUNDLED_QT and provide your own.")
         endif()
@@ -233,8 +233,8 @@ endif()
 
 if (ENABLE_FFMPEG)
     if (CITRA_USE_BUNDLED_FFMPEG)
-        if ((MSVC_VERSION GREATER_EQUAL 1920 AND MSVC_VERSION LESS 1940) AND "x86_64" IN_LIST ARCHITECTURE)
-            set(FFmpeg_VER "ffmpeg-4.1-win64")
+        if (MSVC_VERSION GREATER_EQUAL 1920 AND MSVC_VERSION LESS 1940)
+            set(FFmpeg_VER "ffmpeg-4.2.1-win64")
         else()
             message(FATAL_ERROR "No bundled FFmpeg binaries for your toolchain. Disable CITRA_USE_BUNDLED_FFMPEG and provide your own.")
         endif()
@@ -289,7 +289,7 @@ endif()
 # against all the src files. This should be used before making a pull request.
 # =======================================================================
 
-set(CLANG_FORMAT_POSTFIX "-12")
+set(CLANG_FORMAT_POSTFIX "-15")
 find_program(CLANG_FORMAT
     NAMES clang-format${CLANG_FORMAT_POSTFIX}
           clang-format
@@ -300,7 +300,7 @@ if (NOT CLANG_FORMAT)
         message(STATUS "Clang format not found! Downloading...")
         set(CLANG_FORMAT "${PROJECT_BINARY_DIR}/externals/clang-format${CLANG_FORMAT_POSTFIX}.exe")
         file(DOWNLOAD
-            https://github.com/citra-emu/ext-windows-bin/raw/master/clang-format${CLANG_FORMAT_POSTFIX}.exe
+            https://github.com/Evilmass/ext-win-bin/raw/main/clang-format${CLANG_FORMAT_POSTFIX}.exe
             "${CLANG_FORMAT}" SHOW_PROGRESS
             STATUS DOWNLOAD_SUCCESS)
         if (NOT DOWNLOAD_SUCCESS EQUAL 0)
