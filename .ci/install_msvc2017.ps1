@@ -8,10 +8,11 @@ if (-not (Test-Path "vs_buildtools.exe")) {
     exit 1
 }
 $components = @(
-"Microsoft.VisualStudio.Workload.MSBuildTools",
-"Microsoft.VisualStudio.Workload.VCTools",
-"Microsoft.VisualStudio.Component.Windows10SDK.19041",
-"Microsoft.VisualStudio.Component.VC.v141.x86.x64"
+    "Microsoft.VisualStudio.Workload.MSBuildTools",
+    "Microsoft.VisualStudio.Workload.VCTools",
+    "Microsoft.VisualStudio.Component.Windows10SDK.19041",
+    "Microsoft.VisualStudio.Component.VC.v141.x86.x64",
+    "Microsoft.VisualStudio.ComponentGroup.VC.Tools.142.x86.x64"
 )
 $componentArgs = ($components | ForEach-Object { "--add $_" }) -join " "
 $installCmd = ".\vs_buildtools.exe --quiet --norestart --force --wait --installPath C:\BuildTools $componentArgs"
