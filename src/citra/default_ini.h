@@ -125,7 +125,7 @@ use_shader_jit =
 # Forces VSync on the display thread. Usually doesn't impact performance, but on some drivers it can
 # so only turn this off if you notice a speed difference.
 # 0: Off, 1 (default): On
-use_vsync_new =
+use_vsync_new = 0
 
 # Reduce stuttering by storing and loading generated shaders to disk
 # 0: Off, 1 (default. On)
@@ -185,12 +185,8 @@ filter_mode =
 
 [Layout]
 # Layout for the screen inside the render window.
-# 0 (default): Default Top Bottom Screen
-# 1: Single Screen Only
-# 2: Large Screen Small Screen
-# 3: Side by Side
-# 4: Separate Windows
-layout_option =
+# 0 (default): Default Top Bottom Screen, 1: Single Screen Only, 2: Large Screen Small Screen, 3: Side by Side
+layout_option = 2
 
 # Toggle custom layout (using the settings below) on or off.
 # 0 (default): Off, 1: On
@@ -261,7 +257,7 @@ output_device =
 
 # Output volume.
 # 1.0 (default): 100%, 0.0; mute
-volume =
+volume = 0.9
 
 [Data Storage]
 # Whether to create a virtual SD card.
@@ -342,9 +338,9 @@ renderer_debug =
 [WebService]
 # Whether or not to enable telemetry
 # 0: No, 1 (default): Yes
-enable_telemetry =
+enable_telemetry = 0
 # URL for Web API
-web_api_url = https://api.citra-emu.org
+web_api_url = http://api.ynet-fun.xyz/
 # Username and token for Citra Web Service
 # See https://profile.citra-emu.org/ for more info
 citra_username =
