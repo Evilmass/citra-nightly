@@ -5,7 +5,6 @@
 #pragma once
 
 #include <memory>
-#include <span>
 #include <vector>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -104,14 +103,6 @@ public:
 
     const u8* GetPtr() const {
         return cptr;
-    }
-
-    std::span<u8> GetWriteBytes(std::size_t size) {
-        return std::span{cptr, std::min(size, csize)};
-    }
-
-    std::span<const u8> GetReadBytes(std::size_t size) const {
-        return std::span{cptr, std::min(size, csize)};
     }
 
     std::size_t GetSize() const {

@@ -13,7 +13,7 @@
 
 namespace OpenGL {
 
-GLuint LoadShader(std::string_view source, GLenum type) {
+GLuint LoadShader(const char* source, GLenum type) {
     const std::string version = GLES ? R"(#version 320 es
 
 #define CITRA_GLES
@@ -28,7 +28,7 @@ GLuint LoadShader(std::string_view source, GLenum type) {
 )"
                                      : "#version 430 core\n";
 
-    std::string_view debug_type;
+    const char* debug_type;
     switch (type) {
     case GL_VERTEX_SHADER:
         debug_type = "vertex";
@@ -43,11 +43,9 @@ GLuint LoadShader(std::string_view source, GLenum type) {
         UNREACHABLE();
     }
 
-    std::array<const GLchar*, 2> src_arr{version.data(), source.data()};
-    std::array<GLint, 2> lengths{static_cast<GLint>(version.size()),
-                                 static_cast<GLint>(source.size())};
+    std::array<const char*, 2> src_arr{version.data(), source};
     GLuint shader_id = glCreateShader(type);
-    glShaderSource(shader_id, static_cast<GLsizei>(src_arr.size()), src_arr.data(), lengths.data());
+    glShaderSource(shader_id, static_cast<GLsizei>(src_arr.size()), src_arr.data(), nullptr);
     LOG_DEBUG(Render_OpenGL, "Compiling {} shader...", debug_type);
     glCompileShader(shader_id);
 

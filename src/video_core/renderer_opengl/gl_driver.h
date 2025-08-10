@@ -48,9 +48,6 @@ public:
     /// Returns true of the driver has a particular bug stated in the DriverBug enum
     bool HasBug(DriverBug bug) const;
 
-    /// Returns true if any debug tool is attached
-    bool HasDebugTool();
-
     /// Returns the vendor of the currently selected physical device
     Vendor GetVendor() const {
         return vendor;
@@ -59,11 +56,6 @@ public:
     /// Returns the gpu vendor string returned by the driver
     std::string_view GetVendorString() const {
         return gpu_vendor;
-    }
-
-    /// Returns true if the an OpenGLES context is used
-    bool IsOpenGLES() const noexcept {
-        return is_gles;
     }
 
     /// Returns true if the implementation is suitable for emulation
@@ -107,7 +99,6 @@ private:
     Vendor vendor = Vendor::Unknown;
     DriverBug bugs{};
     bool is_suitable{};
-    bool is_gles{};
 
     bool ext_buffer_storage{};
     bool arb_buffer_storage{};

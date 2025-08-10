@@ -140,7 +140,7 @@ void Config::ReadValues() {
     ReadSetting("Core", Settings::values.cpu_clock_percentage);
 
     // Premium
-    ReadSetting("Premium", Settings::values.texture_filter);
+    ReadSetting("Premium", Settings::values.texture_filter_name);
 
     // Renderer
     Settings::values.use_gles = sdl2_config->GetBoolean("Renderer", "use_gles", true);
