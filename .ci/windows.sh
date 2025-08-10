@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 
-cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v141 \
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v142 \
     -DCMAKE_BUILD_TYPE=Release \
     -DCITRA_USE_BUNDLED_QT=1 \
     -DCITRA_USE_BUNDLED_SDL2=1 \
