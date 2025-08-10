@@ -32,7 +32,7 @@ PathParser::PathParser(const Path& path) {
         return;
     }
 
-    path_sequence = Common::SplitString(path_string, '/');
+    Common::SplitString(path_string, '/', path_sequence);
 
     auto begin = path_sequence.begin();
     auto end = path_sequence.end();

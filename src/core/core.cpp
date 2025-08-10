@@ -27,7 +27,7 @@
 #include "core/dumping/ffmpeg_backend.h"
 #endif
 #include "common/settings.h"
-#include "core/frontend/image_interface.h"
+#include "core/custom_tex_cache.h"
 #include "core/gdbstub/gdbstub.h"
 #include "core/global.h"
 #include "core/hle/kernel/client_port.h"
@@ -48,7 +48,6 @@
 #include "core/movie.h"
 #include "core/rpc/rpc_server.h"
 #include "network/network.h"
-#include "video_core/custom_textures/custom_tex_manager.h"
 #include "video_core/renderer_base.h"
 #include "video_core/video_core.h"
 
@@ -319,15 +318,16 @@ System::ResultStatus System::Load(Frontend::EmuWindow& emu_window, const std::st
                   static_cast<u32>(load_result));
     }
     perf_stats = std::make_unique<PerfStats>(title_id);
+    custom_tex_cache = std::make_unique<Core::CustomTexCache>();
 
     if (Settings::values.custom_textures) {
-        custom_tex_manager->FindCustomTextures();
+        const u64 program_id = Kernel().GetCurrentProcess()->codeset->program_id;
+        FileUtil::CreateFullPath(fmt::format(
+            "{}textures/{:016X}/", FileUtil::GetUserPath(FileUtil::UserPath::LoadDir), program_id));
+        custom_tex_cache->FindCustomTextures(program_id);
     }
     if (Settings::values.preload_textures) {
-        custom_tex_manager->PreloadTextures();
-    }
-    if (Settings::values.dump_textures) {
-        custom_tex_manager->WriteConfig();
+        custom_tex_cache->PreloadTextures(*GetImageInterface());
     }
 
     status = ResultStatus::Success;
@@ -432,12 +432,6 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window,
     video_dumper = std::make_unique<VideoDumper::NullBackend>();
 #endif
 
-    if (!registered_image_interface) {
-        registered_image_interface = std::make_shared<Frontend::ImageInterface>();
-    }
-
-    custom_tex_manager = std::make_unique<VideoCore::CustomTexManager>(*this);
-
     VideoCore::Init(emu_window, secondary_window, *this);
 
     LOG_DEBUG(Core, "Initialized OK");
@@ -511,12 +505,12 @@ const VideoDumper::Backend& System::VideoDumper() const {
     return *video_dumper;
 }
 
-VideoCore::CustomTexManager& System::CustomTexManager() {
-    return *custom_tex_manager;
+Core::CustomTexCache& System::CustomTexCache() {
+    return *custom_tex_cache;
 }
 
-const VideoCore::CustomTexManager& System::CustomTexManager() const {
-    return *custom_tex_manager;
+const Core::CustomTexCache& System::CustomTexCache() const {
+    return *custom_tex_cache;
 }
 
 void System::RegisterMiiSelector(std::shared_ptr<Frontend::MiiSelector> mii_selector) {

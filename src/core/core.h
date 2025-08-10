@@ -10,8 +10,10 @@
 #include <string>
 #include <boost/serialization/version.hpp>
 #include "common/common_types.h"
+#include "core/custom_tex_cache.h"
 #include "core/frontend/applets/mii_selector.h"
 #include "core/frontend/applets/swkbd.h"
+#include "core/frontend/image_interface.h"
 #include "core/loader/loader.h"
 #include "core/memory.h"
 #include "core/perf_stats.h"
@@ -21,8 +23,7 @@ class ARM_Interface;
 
 namespace Frontend {
 class EmuWindow;
-class ImageInterface;
-} // namespace Frontend
+}
 
 namespace Memory {
 class MemorySystem;
@@ -58,9 +59,8 @@ class Backend;
 }
 
 namespace VideoCore {
-class CustomTexManager;
 class RendererBase;
-} // namespace VideoCore
+}
 
 namespace Core {
 
@@ -253,10 +253,10 @@ public:
     [[nodiscard]] const Cheats::CheatEngine& CheatEngine() const;
 
     /// Gets a reference to the custom texture cache system
-    [[nodiscard]] VideoCore::CustomTexManager& CustomTexManager();
+    [[nodiscard]] Core::CustomTexCache& CustomTexCache();
 
     /// Gets a const reference to the custom texture cache system
-    [[nodiscard]] const VideoCore::CustomTexManager& CustomTexManager() const;
+    [[nodiscard]] const Core::CustomTexCache& CustomTexCache() const;
 
     /// Gets a reference to the video dumper backend
     [[nodiscard]] VideoDumper::Backend& VideoDumper();
@@ -362,7 +362,7 @@ private:
     std::unique_ptr<VideoDumper::Backend> video_dumper;
 
     /// Custom texture cache system
-    std::unique_ptr<VideoCore::CustomTexManager> custom_tex_manager;
+    std::unique_ptr<Core::CustomTexCache> custom_tex_cache;
 
     /// Image interface
     std::shared_ptr<Frontend::ImageInterface> registered_image_interface;

@@ -206,11 +206,13 @@ void OptionSetDialog::SetCheckBoxDefaults(const std::string& initial_value) {
         }
     } else {
         // This is a combination of constants, splitted with + or |
-        const auto tmp = Common::SplitString(initial_value, '+');
+        std::vector<std::string> tmp;
+        Common::SplitString(initial_value, '+', tmp);
 
         std::vector<std::string> out;
+        std::vector<std::string> tmp2;
         for (const auto& str : tmp) {
-            const auto tmp2 = Common::SplitString(str, '|');
+            Common::SplitString(str, '|', tmp2);
             out.insert(out.end(), tmp2.begin(), tmp2.end());
         }
         for (int i = 0; i < ui->checkBoxLayout->count(); ++i) {

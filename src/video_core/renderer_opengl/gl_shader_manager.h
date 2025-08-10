@@ -41,7 +41,7 @@ public:
 
     void UseTrivialGeometryShader();
 
-    void UseFragmentShader(const Pica::Regs& config, bool use_normal);
+    void UseFragmentShader(const Pica::Regs& config);
 
     void ApplyTo(OpenGLState& state);
 

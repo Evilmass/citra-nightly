@@ -9,9 +9,8 @@
 #include "video_core/renderer_opengl/gl_state.h"
 
 namespace VideoCore {
-struct Extent;
 struct TextureBlit;
-} // namespace VideoCore
+}
 
 namespace OpenGL {
 
@@ -36,7 +35,7 @@ private:
 
     void FilterXbrz(Surface& surface, const VideoCore::TextureBlit& blit);
 
-    void SetParams(OGLProgram& program, const VideoCore::Extent& src_extent,
+    void SetParams(OGLProgram& program, u32 src_width, u32 src_height,
                    Common::Rectangle<u32> src_rect);
 
     void Draw(OGLProgram& program, GLuint dst_tex, GLuint dst_fbo, u32 dst_level,

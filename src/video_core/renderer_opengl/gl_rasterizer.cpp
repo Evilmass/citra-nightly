@@ -73,13 +73,11 @@ GLenum MakeAttributeType(Pica::PipelineRegs::VertexAttributeFormat format) {
 
 } // Anonymous namespace
 
-RasterizerOpenGL::RasterizerOpenGL(Memory::MemorySystem& memory,
-                                   VideoCore::CustomTexManager& custom_tex_manager,
-                                   VideoCore::RendererBase& renderer, Driver& driver_)
+RasterizerOpenGL::RasterizerOpenGL(Memory::MemorySystem& memory, VideoCore::RendererBase& renderer,
+                                   Driver& driver_)
     : VideoCore::RasterizerAccelerated{memory}, driver{driver_}, runtime{driver, renderer},
-      res_cache{memory, custom_tex_manager, runtime, regs, renderer},
-      texture_buffer_size{TextureBufferSize()}, vertex_buffer{driver, GL_ARRAY_BUFFER,
-                                                              VERTEX_BUFFER_SIZE},
+      res_cache{memory, runtime, regs, renderer}, texture_buffer_size{TextureBufferSize()},
+      vertex_buffer{driver, GL_ARRAY_BUFFER, VERTEX_BUFFER_SIZE},
       uniform_buffer{driver, GL_UNIFORM_BUFFER, UNIFORM_BUFFER_SIZE},
       index_buffer{driver, GL_ELEMENT_ARRAY_BUFFER, INDEX_BUFFER_SIZE},
       texture_buffer{driver, GL_TEXTURE_BUFFER, texture_buffer_size}, texture_lf_buffer{
@@ -184,10 +182,6 @@ RasterizerOpenGL::RasterizerOpenGL(Memory::MemorySystem& memory,
 }
 
 RasterizerOpenGL::~RasterizerOpenGL() = default;
-
-void RasterizerOpenGL::TickFrame() {
-    res_cache.TickFrame();
-}
 
 void RasterizerOpenGL::LoadDiskResources(const std::atomic_bool& stop_loading,
                                          const VideoCore::DiskResourceLoadCallback& callback) {
@@ -426,6 +420,7 @@ bool RasterizerOpenGL::Draw(bool accelerate, bool is_indexed) {
     state.scissor.y = draw_rect.bottom;
     state.scissor.width = draw_rect.GetWidth();
     state.scissor.height = draw_rect.GetHeight();
+    state.Apply();
 
     const u32 res_scale = framebuffer.ResolutionScale();
     if (uniform_block_data.data.framebuffer_scale != res_scale) {
@@ -449,11 +444,10 @@ bool RasterizerOpenGL::Draw(bool accelerate, bool is_indexed) {
 
     // Sync and bind the texture surfaces
     SyncTextureUnits(framebuffer);
-    state.Apply();
 
     // Sync and bind the shader
     if (shader_dirty) {
-        shader_program_manager->UseFragmentShader(regs, use_custom_normal);
+        SetShader();
         shader_dirty = false;
     }
 
@@ -552,7 +546,6 @@ void RasterizerOpenGL::SyncTextureUnits(const Framebuffer& framebuffer) {
             // on the male character's face, which in the OpenGL default appear black.
             state.texture_units[texture_index].texture_2d = default_texture;
         } else if (!IsFeedbackLoop(texture_index, framebuffer, *surface)) {
-            BindMaterial(texture_index, *surface);
             state.texture_units[texture_index].texture_2d = surface->Handle();
         }
     }
@@ -596,33 +589,6 @@ void RasterizerOpenGL::BindTextureCube(const Pica::TexturingRegs::FullTextureCon
     state.texture_units[0].texture_2d = 0;
 }
 
-void RasterizerOpenGL::BindMaterial(u32 texture_index, Surface& surface) {
-    if (!surface.IsCustom() || texture_index != 0) {
-        return;
-    }
-
-    const auto bind_texture = [&](const TextureUnits::TextureUnit& unit, GLuint texture,
-                                  GLuint sampler) {
-        glActiveTexture(unit.Enum());
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glBindSampler(unit.id, sampler);
-    };
-
-    const GLuint sampler = texture_samplers[texture_index].sampler.handle;
-    if (surface.HasNormalMap()) {
-        if (regs.lighting.disable) {
-            LOG_WARNING(Render_OpenGL, "Custom normal map used but scene has no light enabled");
-        }
-        bind_texture(TextureUnits::TextureNormalMap, surface.Handle(2), sampler);
-        use_custom_normal = true;
-    } else {
-        if (use_custom_normal) {
-            bind_texture(TextureUnits::TextureNormalMap, 0, 0);
-        }
-        use_custom_normal = false;
-    }
-}
-
 bool RasterizerOpenGL::IsFeedbackLoop(u32 texture_index, const Framebuffer& framebuffer,
                                       Surface& surface) {
     const GLuint color_attachment = framebuffer.Attachment(SurfaceType::Color);
@@ -656,6 +622,7 @@ void RasterizerOpenGL::UnbindSpecial() {
     state.image_shadow_texture_pz = 0;
     state.image_shadow_texture_nz = 0;
     state.image_shadow_buffer = 0;
+    state.Apply();
 }
 
 void RasterizerOpenGL::NotifyFixedFunctionPicaRegisterChanged(u32 id) {
@@ -854,6 +821,10 @@ void RasterizerOpenGL::SamplerInfo::SyncWithConfig(
         lod_max = config.lod.max_level;
         glSamplerParameterf(s, GL_TEXTURE_MAX_LOD, static_cast<float>(lod_max));
     }
+}
+
+void RasterizerOpenGL::SetShader() {
+    shader_program_manager->UseFragmentShader(Pica::g_state.regs);
 }
 
 void RasterizerOpenGL::SyncClipEnabled() {

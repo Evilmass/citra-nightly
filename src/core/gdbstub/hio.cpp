@@ -136,7 +136,8 @@ void HandleHioReply(const u8* const command_buffer, const u32 command_length) {
     }
 
     const std::string command_str{command_pos, command_buffer + command_length};
-    const auto command_parts = Common::SplitString(command_str, ',');
+    std::vector<std::string> command_parts;
+    Common::SplitString(command_str, ',', command_parts);
 
     if (command_parts.empty() || command_parts.size() > 3) {
         LOG_WARNING(Debug_GDBStub, "Unexpected reply packet size: {}", command_parts);

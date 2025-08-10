@@ -12,6 +12,8 @@ add_executable(citra
     emu_window/emu_window_sdl2_gl.h
     emu_window/emu_window_sdl2_sw.cpp
     emu_window/emu_window_sdl2_sw.h
+    lodepng_image_interface.cpp
+    lodepng_image_interface.h
     precompiled_headers.h
     resource.h
 )
@@ -19,7 +21,7 @@ add_executable(citra
 create_target_directory_groups(citra)
 
 target_link_libraries(citra PRIVATE common core input_common network)
-target_link_libraries(citra PRIVATE inih glad)
+target_link_libraries(citra PRIVATE inih glad lodepng)
 if (MSVC)
     target_link_libraries(citra PRIVATE getopt)
 endif()

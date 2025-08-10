@@ -8,10 +8,11 @@
 #include "common/logging/log.h"
 
 bool QtImageInterface::DecodePNG(std::vector<u8>& dst, u32& width, u32& height,
-                                 std::span<const u8> src) {
-    QImage image(QImage::fromData(src.data(), static_cast<int>(src.size())));
+                                 const std::string& path) {
+    QImage image(QString::fromStdString(path));
+
     if (image.isNull()) {
-        LOG_ERROR(Frontend, "Failed to decode png because image is null");
+        LOG_ERROR(Frontend, "Failed to open {} for decoding", path);
         return false;
     }
     width = image.width();
@@ -20,15 +21,13 @@ bool QtImageInterface::DecodePNG(std::vector<u8>& dst, u32& width, u32& height,
     image = image.convertToFormat(QImage::Format_RGBA8888);
 
     // Write RGBA8 to vector
-    const size_t image_size = width * height * 4;
-    dst.resize(image_size);
-    std::memcpy(dst.data(), image.constBits(), image_size);
+    dst = std::vector<u8>(image.constBits(), image.constBits() + (width * height * 4));
 
     return true;
 }
 
-bool QtImageInterface::EncodePNG(const std::string& path, u32 width, u32 height,
-                                 std::span<const u8> src) {
+bool QtImageInterface::EncodePNG(const std::string& path, const std::vector<u8>& src, u32 width,
+                                 u32 height) {
     QImage image(src.data(), width, height, QImage::Format_RGBA8888);
 
     if (!image.save(QString::fromStdString(path), "PNG")) {

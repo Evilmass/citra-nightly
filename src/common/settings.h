@@ -477,7 +477,6 @@ struct Values {
     SwitchableSetting<bool> dump_textures{false, "dump_textures"};
     SwitchableSetting<bool> custom_textures{false, "custom_textures"};
     SwitchableSetting<bool> preload_textures{false, "preload_textures"};
-    SwitchableSetting<bool> async_custom_loading{true, "async_custom_loading"};
 
     // Audio
     bool audio_muted;
