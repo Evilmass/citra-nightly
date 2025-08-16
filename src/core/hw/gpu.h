@@ -24,11 +24,12 @@ namespace GPU {
 
 
 // Measured on hardware to be 2240568 timer cycles or 4481136 ARM11 cycles
-// constexpr u64 frame_ticks = 4481136ull;
-constexpr u64 frame_ticks = 4468531ull;
+constexpr u64 frame_ticks = 4481136ull;
+// constexpr u64 frame_ticks = 4468531ull;
 
 // (268,111,856) / (4,481,136) = 59.83122493939037Hz
 // (268,111,856) / (4,468,531) = 59.99999910485123Hz
+// (268,868,160) / (4,481,136) = 60.00000000000000H
 constexpr double SCREEN_REFRESH_RATE = BASE_CLOCK_RATE_ARM11 / static_cast<double>(frame_ticks);
 
 // Returns index corresponding to the Regs member labeled by field_name
