@@ -290,7 +290,7 @@
   </action>
   <action name="action_Display_Dock_Widget_Headers">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Display Dock Widget Headers</string>
@@ -298,7 +298,7 @@
   </action>
   <action name="action_Show_Filter_Bar">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Show Filter Bar</string>
