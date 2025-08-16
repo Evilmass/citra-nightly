@@ -14,17 +14,8 @@ Inspired by
    - This commit introduced sudden frame rate drops to **56 FPS**
 2. **Revert [Update FPS to roughly match the actual 3DS rate](https://github.com/Evilmass/citra-nightly/commit/5e95b35900bb8c840169c4446634ff67982aa842)**
    - This commit caused the frame rate to fluctuate between **58–60 FPS**
-3. **Maintain `SCREEN_REFRESH_RATE = 60`**
+3. **Maintain `BASE_CLOCK_RATE_ARM11 = 268868160`**
    - Keeping this setting ensures the emulator runs at a **steady 60 FPS**
-
-```c
-// src\core\hw\gpu.h
-constexpr float SCREEN_REFRESH_RATE = 60;
-
-// src\core\hw\gpu.cpp
-// 268MHz CPU clocks / 60Hz frames per second
-const u64 frame_ticks = static_cast<u64>(BASE_CLOCK_RATE_ARM11 / SCREEN_REFRESH_RATE);
-```
 
 
 ## buildtools
@@ -34,10 +25,6 @@ const u64 frame_ticks = static_cast<u64>(BASE_CLOCK_RATE_ARM11 / SCREEN_REFRESH_
 - **[Git](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)**
 - **[7z](https://www.7-zip.org/a/7z2500-x64.exe)**
 
-<!-- ```shell
-# vulkan SDK
-VulkanSDK-1.4.304.1-Installer.exe --accept-licenses --default-answer --confirm-command install --system-proxy=http://127.0.0.1:10808
-``` -->
 
 ## build
 
