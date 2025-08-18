@@ -17,7 +17,7 @@ if (APPLE)
     enable_language(OBJC)
 endif()
 
-option(ENABLE_LTO "Enable link time optimization" OFF)
+option(ENABLE_LTO "Enable link time optimization" ON)
 
 option(ENABLE_SDL2 "Enable the SDL2 frontend" ON)
 option(USE_SYSTEM_SDL2 "Use the system SDL2 lib (instead of the bundled one)" OFF)
