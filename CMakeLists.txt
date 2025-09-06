@@ -11,6 +11,8 @@ include(CMakeDependentOption)
 
 project(citra)
 
+option(ENABLE_LTO "Enable link time optimization" ON)
+
 # Set bundled sdl2/qt as dependent options.
 # OFF by default, but if ENABLE_SDL2 and MSVC are true then ON
 option(ENABLE_SDL2 "Enable the SDL2 frontend" ON)

@@ -1,38 +1,31 @@
 1671 auto mapping button revert core timing
 ==============
-update .gitignore
-update default.ini
-update disable_telemetry
-add pack.sh
-add appveyor.yml
-fix submodules
-fix CMakeModules\DownloadExternals.cmake
-fix msbuild error
-    C:\Users\Evilmass\Desktop\dev\src\core\hle\kernel\thread.cpp(123): error C2679: 二进制“=”: 没有找到接受“std::weak_ptr<_Ty>”类型的右操作数的运算符(或没有可接
-受的转换)
-    https://github.com/Evilmass/citra-nightly/commits/cb44e4408d5e3fd6ec4f7c39c51aa094389408ba/src/core/hle/kernel/thread.cpp?since=2020-05-11&until=2021-01-01
-    https://github.com/Evilmass/citra-nightly/blob/ce16653cc81a1298a34741a7af4808da988a190f/src/core/hle/kernel/thread.cpp#L123
-update ci.yml
 
-mscv build
-==============
-<!-- [Visual Studio 2017 BuildTools](https://aka.ms/vs/15/release/vs_buildtools.exe) -->
-[Visual Studio 2022 BuildTools](https://aka.ms/vs/17/release/vs_buildtools.exe)
-<!-- [winsdk](https://download.microsoft.com/download/696beb13-858a-4361-bd85-196f22394c93/KIT_BUNDLE_WINDOWSSDK_MEDIACREATION/winsdksetup.exe)
-- only select `Debugging Tools For Windows` -> pdbstr.exe -->
-[Git For Windows](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
-[Cmake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
-[7z](https://www.7-zip.org/a/7z2500-x64.exe)
-<!-- https://www.doxygen.nl/files/doxygen-1.14.0.windows.x64.bin.zip -->
+Custom-built emulator optimized for Monster Hunter Double Cross
+- **Fix lag:** Periodic slowdowns with frame drops
+- **Port functions:** Touch-mapping, fix SaveStates hotkeys
+
+Inspired by
+- [Lurpigi/Lime3DS](https://github.com/Lurpigi/lime3ds-dqmj3p)
+- [Slashaim/citra-dqmj3pro](https://github.com/Slashaim/citra-dqmj3pro)
+
+
+## buildtools
+- **[VS2022_BuildTools](https://aka.ms/vs/17/release/vs_buildtools.exe)**
+- **[Vulkan SDK 1.4.304.1](https://sdk.lunarg.com/sdk/download/1.4.304.1/windows/VulkanSDK-1.4.304.1-Installer.exe)**
+- **[Cmake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)**
+- **[Git](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)**
+- **[7z](https://www.7-zip.org/a/7z2500-x64.exe)**
+
+
+## build
 
 ```shell
 git clone -b 1671 --recursive https://github.com/Evilmass/citra-nightly
 
 # msvc 2017
-mkdir build
 cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v142 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DENABLE_QT_TRANSLATION=OFF -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DENABLE_COMPATIBILITY_LIST_DOWNLOAD=OFF -DUSE_DISCORD_PRESENCE=OFF
-rm -rf build/bin
-msbuild build/citra.sln -m -p:Configuration=Release,Platform=x64 -t:Rebuild
+rm -rf build/bin && msbuild build/citra.sln -m -p:Configuration=Release,Platform=x64 -t:Rebuild
 
 # pack
 bash pack.sh build/
@@ -50,46 +43,4 @@ git commit -m "Fix: Add execute permission to source.sh and windows.sh"
 git push
 ```
 
-**BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
-
-Citra
-==============
-[![GitHub Actions Build Status](https://github.com/citra-emu/citra/workflows/citra-ci/badge.svg)](https://github.com/citra-emu/citra/actions)
-[![Bitrise CI Build Status](https://app.bitrise.io/app/4ccd8e5720f0d13b/status.svg?token=H32TmbCwxb3OQ-M66KbAyw&branch=master)](https://app.bitrise.io/app/4ccd8e5720f0d13b)
-[![Discord](https://img.shields.io/discord/220740965957107713?color=%237289DA&label=Citra&logo=discord&logoColor=white)](https://discord.gg/FAXfZV9)
-
-Citra is an experimental open-source Nintendo 3DS emulator/debugger written in C++. It is written with portability in mind, with builds actively maintained for Windows, Linux and macOS.
-
-Citra emulates a subset of 3DS hardware and therefore is useful for running/debugging homebrew applications, and it is also able to run many commercial games! Some of these do not run at a playable state, but we are working every day to advance the project forward. (Playable here means compatibility of at least "Okay" on our [game compatibility list](https://citra-emu.org/game).)
-
-Citra is licensed under the GPLv2 (or any later version). Refer to the license.txt file included. Please read the [FAQ](https://citra-emu.org/wiki/faq/) before getting started with the project.
-
-Check out our [website](https://citra-emu.org/)!
-
-Need help? Check out our [asking for help](https://citra-emu.org/help/reference/asking/) guide.
-
-For development discussion, please join us on our [Discord server](https://citra-emu.org/discord/) or at #citra-dev on freenode.
-
-### Development
-
-Most of the development happens on GitHub. It's also where [our central repository](https://github.com/citra-emu/citra) is hosted.
-
-If you want to contribute please take a look at the [Contributor's Guide](https://github.com/citra-emu/citra/wiki/Contributing) and [Developer Information](https://github.com/citra-emu/citra/wiki/Developer-Information). You should also contact any of the developers in the forum in order to know about the current state of the emulator because the [TODO list](https://docs.google.com/document/d/1SWIop0uBI9IW8VGg97TAtoT_CHNoP42FzYmvG1F4QDA) isn't maintained anymore.
-
-If you want to contribute to the user interface translation, please check out the [citra project on transifex](https://www.transifex.com/citra/citra). We centralize the translation work there, and periodically upstream translations.
-
-### Building
-
-* __Windows__: [Windows Build](https://github.com/citra-emu/citra/wiki/Building-For-Windows)
-* __Linux__: [Linux Build](https://github.com/citra-emu/citra/wiki/Building-For-Linux)
-* __macOS__: [macOS Build](https://github.com/citra-emu/citra/wiki/Building-for-macOS)
-
-
-### Support
-We happily accept monetary donations or donated games and hardware. Please see our [donations page](https://citra-emu.org/donate/) for more information on how you can contribute to Citra. Any donations received will go towards things like:
-* 3DS consoles for developers to explore the hardware
-* 3DS games for testing
-* Any equipment required for homebrew
-* Infrastructure setup
-
-We also more than gladly accept used 3DS consoles! If you would like to give yours away, don't hesitate to join our [Discord server](https://citra-emu.org/discord/) and talk to bunnei.
+[ORIGINAL_README](./ORIGINAL_README.md)
