@@ -870,6 +870,7 @@ private:
     void LoadCameraImplementation(CameraConfig& camera, int camera_id);
 
     Core::System& system;
+    bool initialized{};
     std::array<CameraConfig, NumCameras> cameras;
     std::array<PortConfig, 2> ports;
     Core::TimingEventType* completion_event_callback;
@@ -877,7 +878,7 @@ private:
     std::atomic<bool> is_camera_reload_pending{false};
 
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int);
+    void serialize(Archive& ar, const unsigned int file_version);
     friend class boost::serialization::access;
 };
 
@@ -888,4 +889,5 @@ void InstallInterfaces(Core::System& system);
 } // namespace Service::CAM
 
 SERVICE_CONSTRUCT(Service::CAM::Module)
+BOOST_CLASS_VERSION(Service::CAM::Module, 1)
 BOOST_CLASS_VERSION(Service::CAM::Module::CameraConfig, 1)
