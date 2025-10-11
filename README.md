@@ -1,44 +1,69 @@
-**BEFORE FILING AN ISSUE, READ THE RELEVANT SECTION IN THE [CONTRIBUTING](https://github.com/citra-emu/citra/wiki/Contributing#reporting-issues) FILE!!!**
+## citra-mhxx
 
-Citra
-==============
-[![Travis CI Build Status](https://travis-ci.com/citra-emu/citra.svg?branch=master)](https://travis-ci.com/citra-emu/citra)
-[![AppVeyor CI Build Status](https://ci.appveyor.com/api/projects/status/sdf1o4kh3g1e68m9?svg=true)](https://ci.appveyor.com/project/bunnei/citra)
-[![Bitrise CI Build Status](https://app.bitrise.io/app/4ccd8e5720f0d13b/status.svg?token=H32TmbCwxb3OQ-M66KbAyw&branch=master)](https://app.bitrise.io/app/4ccd8e5720f0d13b)
-[![Discord](https://img.shields.io/discord/220740965957107713?color=%237289DA&label=Citra&logo=discord&logoColor=white)](https://discord.gg/FAXfZV9)
+Custom-built emulator based on [nightly 1543](https://web.archive.org/web/20220908222930/https://github.com/citra-emu/citra-nightly/releases/tag/nightly-1543) → [last build before the core timing rewrite](https://web.archive.org/web/20230603005840/https://citra-emu.org/wiki/citra-legacy-builds/#last-build-before-the-core-timing-rewrite), optimized for Monster Hunter Double Cross
 
-Citra is an experimental open-source Nintendo 3DS emulator/debugger written in C++. It is written with portability in mind, with builds actively maintained for Windows, Linux and macOS.
+- **Fix lag:** Periodic slowdowns with frame drops
+- **Port functions:** Touch-mapping, fix SaveStates hotkeys
 
-Citra emulates a subset of 3DS hardware and therefore is useful for running/debugging homebrew applications, and it is also able to run many commercial games! Some of these do not run at a playable state, but we are working every day to advance the project forward. (Playable here means compatibility of at least "Okay" on our [game compatibility list](https://citra-emu.org/game).)
+Inspired by
+- [Lurpigi/Lime3DS](https://github.com/Lurpigi/lime3ds-dqmj3p)
+- [Slashaim/citra-dqmj3pro](https://github.com/Slashaim/citra-dqmj3pro)
 
-Citra is licensed under the GPLv2 (or any later version). Refer to the license.txt file included. Please read the [FAQ](https://citra-emu.org/wiki/faq/) before getting started with the project.
+---
 
-Check out our [website](https://citra-emu.org/)!
+## Build Tools
 
-Need help? Check out our [asking for help](https://citra-emu.org/help/reference/asking/) guide.
+- [VS2022 Build Tools](https://aka.ms/vs/17/release/vs_buildtools.exe)
 
-For development discussion, please join us on our [Discord server](https://citra-emu.org/discord/) or at #citra-dev on freenode.
+  `Windows 10 SDK (10.0.19041.0) + MSVC v141 VS2017 C++ x64-86 BuildTools (v14.16.27023)`
+- [Git](https://github.com/git-for-windows/git/releases/download/v2.50.1.windows.1/Git-2.50.1-64-bit.exe)
+- [CMake](https://github.com/Kitware/CMake/releases/download/v4.0.3/cmake-4.0.3-windows-x86_64.msi)
+- [ccache](https://github.com/ccache/ccache/releases/download/v4.11.3/ccache-4.11.3-windows-x86_64.zip)
+- [7-Zip](https://www.7-zip.org/a/7z2500-x64.exe)
 
-### Development
+---
 
-Most of the development happens on GitHub. It's also where [our central repository](https://github.com/citra-emu/citra) is hosted.
+## MSVC Build
 
-If you want to contribute please take a look at the [Contributor's Guide](https://github.com/citra-emu/citra/wiki/Contributing) and [Developer Information](https://github.com/citra-emu/citra/wiki/Developer-Information). You should also contact any of the developers in the forum in order to know about the current state of the emulator because the [TODO list](https://docs.google.com/document/d/1SWIop0uBI9IW8VGg97TAtoT_CHNoP42FzYmvG1F4QDA) isn't maintained anymore.
+```sh
+# git-bash --login -i
+git clone -b 1543 --recursive https://github.com/Evilmass/citra-nightly.git
 
-If you want to contribute to the user interface translation, please checkout [citra project on transifex](https://www.transifex.com/citra/citra). We centralize the translation work there, and periodically upstream translation.
+# cmake
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v141 -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCITRA_USE_BUNDLED_QT=1 -DCITRA_USE_BUNDLED_SDL2=1 -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_MF=ON -DENABLE_FFMPEG_VIDEO_DUMPER=ON
 
-### Building
+# clear
+rm -rf build/bin
 
-* __Windows__: [Windows Build](https://github.com/citra-emu/citra/wiki/Building-For-Windows)
-* __Linux__: [Linux Build](https://github.com/citra-emu/citra/wiki/Building-For-Linux)
-* __macOS__: [macOS Build](https://github.com/citra-emu/citra/wiki/Building-for-macOS)
+# build
+msbuild build/citra.sln -property:Configuration=Release,Platform=x64 -maxCpuCount -target:Rebuild
+
+# pack
+bash pack.sh build/
+```
+
+---
+
+## AppVeyor
+
+Full build logs: [https://ci.appveyor.com/project/Evilmass/citra-nightly](https://ci.appveyor.com/project/Evilmass/citra-nightly)
 
 
-### Support
-We happily accept monetary donations or donated games and hardware. Please see our [donations page](https://citra-emu.org/donate/) for more information on how you can contribute to Citra. Any donations received will go towards things like:
-* 3DS consoles for developers to explore the hardware
-* 3DS games for testing
-* Any equipment required for homebrew
-* Infrastructure setup
+## Note
+```shell
+# aqtinstall
+aqt.exe install-qt windows desktop 5.10.0 win64_msvc2017_64 -m qtmultimedia --outputdir ./qt-5.10.0-msvc2017_64 # qttranslations
 
-We also more than gladly accept used 3DS consoles! If you would like to give yours away, don't hesitate to join our [Discord server](https://citra-emu.org/discord/) and talk to bunnei.
+# github actions shell permission denied
+git update-index --chmod=+x ./.ci/source.sh
+git update-index --chmod=+x ./.ci/pack.sh
+git update-index --chmod=+x ./.ci/windows.sh
+git commit -m "Fix: Add execute permission to source.sh and windows.sh"
+git push
+```
+
+## Original README
+
+See [ORIGINAL_README](./ORIGINAL_README.md)
+
+---
