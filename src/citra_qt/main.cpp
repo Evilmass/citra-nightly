@@ -197,7 +197,7 @@ GMainWindow::GMainWindow() : config(new Config()), emu_thread(nullptr) {
     game_list->PopulateAsync(UISettings::values.game_dirs);
 
     // Show one-time "callout" messages to the user
-    ShowTelemetryCallout();
+    // ShowTelemetryCallout();
 
     // make sure menubar has the arrow cursor instead of inheriting from this
     ui.menubar->setCursor(QCursor());
