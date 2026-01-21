@@ -43,4 +43,14 @@ git commit -m "Fix: Add execute permission to source.sh and windows.sh"
 git push
 ```
 
+## Docker
+```sh
+sudo apt install libqt5multimedia5-plugins
+# docker pull evi1docker/build-environments:linux-appimage
+git clone -b 1671 --recursive https://github.com/Evilmass/citra-nightly/ app
+docker run --rm -v ./app:/app -w /app \
+ evi1docker/build-environments:linux-appimage \
+ /bin/sh -c "git config --global --add safe.directory /app && ./.ci/linux.sh"
+```
+
 [ORIGINAL_README](./ORIGINAL_README.md)

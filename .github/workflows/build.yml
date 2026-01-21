@@ -2,7 +2,7 @@ name: citra-ci
 
 on:
   push:
-    branches: [ "1671" ]
+    branches: [ "*" ]
   workflow_dispatch:
 jobs:
   source:
@@ -62,9 +62,40 @@ jobs:
         with:
           name: windows-msvc
           path: artifacts/
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ["linux"]
+    container: evi1docker/build-environments:linux-appimage
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-${{ matrix.image }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.image }}-
+      - name: Query tag name
+        uses: little-core-labs/get-git-tag@v3.0.2
+        id: tagName
+      - name: Build
+        run: ./.ci/linux.sh
+      - name: Pack
+        run: ./.ci/upload.sh
+        env:
+          NAME: ${{ matrix.image }}
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.image }}
+          path: artifacts/
   release:
     runs-on: ubuntu-latest
-    needs: [windows, source]
+    needs: [windows, linux, source]
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
     steps:
       - uses: actions/download-artifact@v4
