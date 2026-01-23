@@ -61,22 +61,6 @@ if (BUNDLE_TARGET_EXECUTE)
             --desktop-file "${source_path}/dist/${executable_name}.desktop"
             --appdir "${appdir_path}")
 
-        if (enable_qt)
-            set(qt_hook_file "${appdir_path}/apprun-hooks/linuxdeploy-plugin-qt-hook.sh")
-            file(READ "${qt_hook_file}" qt_hook_contents)
-            # Add Cinnamon to list of DEs for GTK3 theming.
-            string(REPLACE
-                "*XFCE*"
-                "*X-Cinnamon*|*XFCE*"
-                qt_hook_contents "${qt_hook_contents}")
-            # Wayland backend crashes due to changed schemas in Gnome 40.
-            string(REPLACE
-                "export QT_QPA_PLATFORMTHEME=gtk3"
-                "export QT_QPA_PLATFORMTHEME=gtk3; export GDK_BACKEND=x11"
-                qt_hook_contents "${qt_hook_contents}")
-            file(WRITE "${qt_hook_file}" "${qt_hook_contents}")
-        endif()
-
         message(STATUS "Creating AppImage for executable ${executable_path}")
         execute_process(COMMAND ${CMAKE_COMMAND} -E env
             "OUTPUT=${bundle_dir}/${executable_name}.AppImage"
