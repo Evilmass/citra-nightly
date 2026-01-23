@@ -715,6 +715,9 @@ void System::serialize(Archive& ar, const unsigned int file_version) {
 
     // This needs to be set from somewhere - might as well be here!
     if (Archive::is_loading::value) {
+        if (Settings::values.custom_textures) {
+            custom_tex_manager->FindCustomTextures();
+        }
         timing->UnlockEventQueue();
         Service::GSP::SetGlobalModule(*this);
         memory->SetDSP(*dsp_core);
