@@ -438,7 +438,7 @@ struct Values {
     Setting<bool> dump_command_buffers{false, "dump_command_buffers"};
     SwitchableSetting<bool> spirv_shader_gen{true, "spirv_shader_gen"};
     SwitchableSetting<bool> async_shader_compilation{false, "async_shader_compilation"};
-    SwitchableSetting<bool> async_presentation{true, "async_presentation"};
+    SwitchableSetting<bool> async_presentation{false, "async_presentation"};
     SwitchableSetting<bool> use_hw_shader{true, "use_hw_shader"};
     SwitchableSetting<bool> use_disk_shader_cache{true, "use_disk_shader_cache"};
     SwitchableSetting<bool> shaders_accurate_mul{true, "shaders_accurate_mul"};
