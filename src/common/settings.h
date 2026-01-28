@@ -510,6 +510,10 @@ struct Values {
     // Miscellaneous
     Setting<std::string> log_filter{"*:Info", "log_filter"};
 
+    // Hacks
+    SwitchableSetting<bool> enable_custom_cpu_ticks{false, "enable_custom_cpu_ticks"};
+    SwitchableSetting<u32, true> custom_cpu_ticks{16000, 77, 65535, "custom_cpu_ticks"};
+
     // Video Dumping
     std::string output_format;
     std::string format_options;

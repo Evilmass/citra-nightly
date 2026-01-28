@@ -6,6 +6,7 @@
 #include <tuple>
 #include "common/assert.h"
 #include "common/logging/log.h"
+#include "common/settings.h"
 #include "core/core_timing.h"
 
 namespace Core {
@@ -146,7 +147,10 @@ u64 Timing::Timer::GetTicks() const {
 }
 
 void Timing::Timer::AddTicks(u64 ticks) {
-    downcount -= static_cast<u64>(ticks * cpu_clock_scale);
+    downcount -= static_cast<u64>((Settings::values.enable_custom_cpu_ticks
+                                       ? Settings::values.custom_cpu_ticks.GetValue()
+                                       : ticks) *
+                                  cpu_clock_scale);
 }
 
 u64 Timing::Timer::GetIdleTicks() const {

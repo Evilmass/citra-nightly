@@ -70,6 +70,13 @@ ConfigureDebug::ConfigureDebug(bool is_powered_on_, QWidget* parent)
     ui->toggle_renderer_debug->setEnabled(!is_powered_on);
     ui->toggle_dump_command_buffers->setEnabled(!is_powered_on);
 
+    // Hacks
+    connect(ui->toggle_custom_cpu_ticks, &QCheckBox::toggled, this, [this] {
+        const bool enabled = ui->toggle_custom_cpu_ticks->isEnabled();
+        const bool checked = ui->toggle_custom_cpu_ticks->isChecked();
+        ui->custom_cpu_ticks_spinbox->setEnabled(checked && enabled);
+    });
+
     // Set a minimum width for the label to prevent the slider from changing size.
     // This scales across DPIs. (This value should be enough for "xxx%")
     ui->clock_display_label->setMinimumWidth(40);
@@ -96,6 +103,9 @@ void ConfigureDebug::SetConfiguration() {
     ui->toggle_cpu_jit->setChecked(Settings::values.use_cpu_jit.GetValue());
     ui->toggle_renderer_debug->setChecked(Settings::values.renderer_debug.GetValue());
     ui->toggle_dump_command_buffers->setChecked(Settings::values.dump_command_buffers.GetValue());
+    ui->toggle_custom_cpu_ticks->setChecked(Settings::values.enable_custom_cpu_ticks.GetValue());
+    ui->custom_cpu_ticks_spinbox->setEnabled(Settings::values.enable_custom_cpu_ticks.GetValue());
+    ui->custom_cpu_ticks_spinbox->setValue(Settings::values.custom_cpu_ticks.GetValue());
 
     if (!Settings::IsConfiguringGlobal()) {
         if (Settings::values.cpu_clock_percentage.UsingGlobal()) {
@@ -127,6 +137,8 @@ void ConfigureDebug::ApplyConfiguration() {
     Settings::values.use_cpu_jit = ui->toggle_cpu_jit->isChecked();
     Settings::values.renderer_debug = ui->toggle_renderer_debug->isChecked();
     Settings::values.dump_command_buffers = ui->toggle_dump_command_buffers->isChecked();
+    Settings::values.enable_custom_cpu_ticks = ui->toggle_custom_cpu_ticks->isChecked();
+    Settings::values.custom_cpu_ticks = ui->custom_cpu_ticks_spinbox->value();
 
     ConfigurationShared::ApplyPerGameSetting(
         &Settings::values.cpu_clock_percentage, ui->clock_speed_combo,

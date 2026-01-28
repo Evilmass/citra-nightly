@@ -72,6 +72,8 @@ void LogSettings() {
     LOG_INFO(Config, "Citra Configuration:");
     log_setting("Core_UseCpuJit", values.use_cpu_jit.GetValue());
     log_setting("Core_CPUClockPercentage", values.cpu_clock_percentage.GetValue());
+    log_setting("Core_EnableCustomCPUTicks", values.enable_custom_cpu_ticks.GetValue());
+    log_setting("Core_CustomCPUTicks", values.custom_cpu_ticks.GetValue());
     log_setting("Renderer_UseGLES", values.use_gles.GetValue());
     log_setting("Renderer_GraphicsAPI", GetGraphicsAPIName(values.graphics_api.GetValue()));
     log_setting("Renderer_AsyncShaders", values.async_shader_compilation.GetValue());
@@ -160,6 +162,8 @@ void RestoreGlobalState(bool is_powered_on) {
 
     // Core
     values.cpu_clock_percentage.SetGlobal(true);
+    values.enable_custom_cpu_ticks.SetGlobal(true);
+    values.custom_cpu_ticks.SetGlobal(true);
     values.is_new_3ds.SetGlobal(true);
 
     // Renderer

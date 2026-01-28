@@ -97,6 +97,15 @@ use_cpu_jit =
 # Range is any positive integer (but we suspect 25 - 400 is a good idea) Default is 100
 cpu_clock_percentage =
 
+# Enable Custom CPU ticks
+# 0 (default): Off, 1: On
+enable_custom_cpu_ticks =
+
+# Set Custom CPU ticks
+# Set a custom value of CPU ticks. Higher values can increase performance but if they're too high,
+# it may cause the game to freeze. A range of 77-21000 is recommended.
+enable_custom_cpu_ticks =
+
 [Renderer]
 # Whether to render using OpenGL or Software
 # 0: Software, 1: OpenGL (default), 2: Vulkan
