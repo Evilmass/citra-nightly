@@ -393,8 +393,7 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window,
 
     memory = std::make_unique<Memory::MemorySystem>(*this);
 
-    timing = std::make_unique<Timing>(num_cores, Settings::values.cpu_clock_percentage.GetValue(),
-                                      movie.GetOverrideBaseTicks());
+    timing = std::make_unique<Timing>(num_cores, Settings::values.cpu_clock_percentage.GetValue());
 
     kernel = std::make_unique<Kernel::KernelSystem>(
         *memory, *timing, [this] { PrepareReschedule(); }, memory_mode, num_cores, n3ds_hw_caps,
