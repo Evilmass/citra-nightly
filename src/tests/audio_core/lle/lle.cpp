@@ -54,7 +54,7 @@ TEST_CASE("DSP LLE Sanity", "[audio_core][lle]") {
         do {
             core_timing.GetTimer(0)->AddTicks(core_timing.GetTimer(0)->GetDowncount());
             core_timing.GetTimer(0)->Advance();
-            core_timing.GetTimer(0)->SetNextSlice();
+            // core_timing.GetTimer(0)->SetNextSlice();
         } while (lle.GetPipeReadableSize(AudioCore::DspPipe::Audio) == 0);
 
         REQUIRE(lle.GetPipeReadableSize(AudioCore::DspPipe::Audio) >= 32);
@@ -87,7 +87,7 @@ TEST_CASE("DSP LLE Sanity", "[audio_core][lle]") {
         do {
             core_timing.GetTimer(0)->AddTicks(core_timing.GetTimer(0)->GetDowncount());
             core_timing.GetTimer(0)->Advance();
-            core_timing.GetTimer(0)->SetNextSlice();
+            // core_timing.GetTimer(0)->SetNextSlice();
         } while (lle.GetPipeReadableSize(AudioCore::DspPipe::Binary) == 0);
 
         REQUIRE(lle.GetPipeReadableSize(AudioCore::DspPipe::Binary) >= 32);
