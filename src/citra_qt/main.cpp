@@ -640,6 +640,8 @@ void GMainWindow::InitializeHotkeys() {
                      [&] { Settings::values.dump_textures = !Settings::values.dump_textures; });
     connect_shortcut(QStringLiteral("Toggle Custom Textures"),
                      [&] { Settings::values.custom_textures = !Settings::values.custom_textures; });
+    connect_shortcut(QStringLiteral("Toggle Custom Cpu Ticks"),
+                     [&] { Settings::values.enable_custom_cpu_ticks = !Settings::values.enable_custom_cpu_ticks; });
     // We use "static" here in order to avoid capturing by lambda due to a MSVC bug, which makes
     // the variable hold a garbage value after this function exits
     static constexpr u16 SPEED_LIMIT_STEP = 5;
