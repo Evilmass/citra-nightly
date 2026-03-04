@@ -473,13 +473,18 @@ const std::array thumb_matchers{
 namespace Core {
 
 u64 TicksForInstruction(bool is_thumb, u32 instruction) {
-    if (is_thumb) {
-        return 1;
-    }
-
     const auto matches_instruction = [instruction](const auto& matcher) {
         return (instruction & matcher.mask) == matcher.expect;
     };
+
+    if (is_thumb) {
+        auto iter =
+            std::find_if(thumb_matchers.begin(), thumb_matchers.end(), matches_instruction);
+        if (iter != thumb_matchers.end()) {
+            return iter->fn(instruction);
+        }
+        return 1;
+    }
 
     auto iter = std::find_if(arm_matchers.begin(), arm_matchers.end(), matches_instruction);
     if (iter != arm_matchers.end()) {
