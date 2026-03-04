@@ -24,15 +24,19 @@ bass off [Add vulkan backend (#6512)](dfa2fd0e0de74dea2f984beef4d847da5e18ab43)
     upscaling
 
 ```shell
+# glslang
+add [glslang](https://github.com/KhronosGroup/glslang/releases/download/main-tot/glslang-master-windows-Release.zip) to PATH
+
+# src
 git clone -b vulkan --recursive https://github.com/Evilmass/citra-nightly
 
 # msvc 2017
-cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v142 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_BUILD_TYPE=Release -DENABLE_QT_TRANSLATION=ON -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF
+cmake --fresh -S . -B build -G "Visual Studio 17 2022" -A x64 -T v142 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_BUILD_TYPE=Release -DENABLE_QT_TRANSLATION=ON -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_TESTS=OFF
 rm -rf bulid/bin && msbuild build/citra.sln -m -p:Configuration=Release,Platform=x64 -t:Rebuild
 
 # clang64
 mkdir ninja_build && cd ninja_build
-cmake .. --fresh -G Ninja -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DENABLE_QT_TRANSLATION=ON -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF
+cmake .. --fresh -G Ninja -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DENABLE_QT_TRANSLATION=ON -DCITRA_ENABLE_COMPATIBILITY_REPORTING=OFF -DUSE_DISCORD_PRESENCE=OFF -DENABLE_TESTS=OFF
 ninja
 ninja bundle
 
