@@ -457,7 +457,9 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window,
         registered_image_interface = std::make_shared<Frontend::ImageInterface>();
     }
 
-    custom_tex_manager = std::make_unique<VideoCore::CustomTexManager>(*this);
+    if (!custom_tex_manager) {
+        custom_tex_manager = std::make_unique<VideoCore::CustomTexManager>(*this);
+    }
 
     auto gsp = service_manager->GetService<Service::GSP::GSP_GPU>("gsp::Gpu");
     gpu = std::make_unique<VideoCore::GPU>(*this, emu_window, secondary_window);
@@ -585,8 +587,10 @@ void System::Shutdown(bool is_deserializing) {
         GDBStub::Shutdown();
         perf_stats.reset();
         app_loader.reset();
+        custom_tex_manager.reset();
+    } else if (custom_tex_manager) {
+        custom_tex_manager->ClearAsyncUploads();
     }
-    custom_tex_manager.reset();
     telemetry_session.reset();
 #ifdef ENABLE_SCRIPTING
     rpc_server.reset();

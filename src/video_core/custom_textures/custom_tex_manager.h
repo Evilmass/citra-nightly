@@ -59,6 +59,12 @@ public:
     /// Decodes the textures in material to a consumable format and uploads it.
     bool Decode(Material* material, std::function<bool()>&& upload);
 
+    /// Clears pending async uploads. Must be called during state load to avoid
+    /// dangling pointers to the destroyed rasterizer cache.
+    void ClearAsyncUploads() {
+        async_uploads.clear();
+    }
+
     /// True when mipmap uploads should be skipped (legacy packs only)
     bool SkipMipmaps() const noexcept {
         return skip_mipmap;
