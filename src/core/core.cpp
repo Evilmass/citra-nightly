@@ -424,7 +424,9 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window,
         registered_image_interface = std::make_shared<Frontend::ImageInterface>();
     }
 
-    custom_tex_manager = std::make_unique<VideoCore::CustomTexManager>(*this);
+    if (!custom_tex_manager) {
+        custom_tex_manager = std::make_unique<VideoCore::CustomTexManager>(*this);
+    }
 
     VideoCore::Init(emu_window, secondary_window, *this);
 
@@ -545,8 +547,8 @@ void System::Shutdown(bool is_deserializing) {
         perf_stats.reset();
         cheat_engine.reset();
         app_loader.reset();
+        custom_tex_manager.reset();
     }
-    custom_tex_manager.reset();
     telemetry_session.reset();
 #ifdef ENABLE_SCRIPTING
     rpc_server.reset();
