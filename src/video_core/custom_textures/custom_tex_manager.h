@@ -59,6 +59,13 @@ public:
     /// Decodes the textures in material to a consumable format and uploads it.
     bool Decode(Material* material, std::function<bool()>&& upload);
 
+    /// Clears pending async uploads. Must be called when the rasterizer cache is destroyed
+    /// to avoid use-after-free from stale upload callbacks.
+    /// Note: Only called from the emulation thread (state load path), same thread as TickFrame().
+    void ClearAsyncUploads() {
+        async_uploads.clear();
+    }
+
     /// True when mipmap uploads should be skipped (legacy packs only)
     bool SkipMipmaps() const noexcept {
         return skip_mipmap;

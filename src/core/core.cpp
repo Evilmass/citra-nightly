@@ -710,6 +710,11 @@ void System::serialize(Archive& ar, const unsigned int file_version) {
         // Shutdown, but persist a few things between loads...
         Shutdown(true);
 
+        // Clear stale async upload callbacks that reference the destroyed rasterizer cache.
+        if (custom_tex_manager) {
+            custom_tex_manager->ClearAsyncUploads();
+        }
+
         // Re-initialize everything like it was before
         auto memory_mode = this->app_loader->LoadKernelMemoryMode();
         auto n3ds_hw_caps = this->app_loader->LoadNew3dsHwCapabilities();
