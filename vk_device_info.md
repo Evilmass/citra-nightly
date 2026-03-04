@@ -10,4 +10,4 @@ bin\Release\citra-qt.exe : fatal error LNK1120: 1 个无法解析的外部命令
 
 复现：`-DVulkan_INCLUDE_DIR="C:\VulkanSDK\1.4.321.0\Include"`
 
-fix: set VULKAN_SDK=
+fix: 卸载系统安装的 VULKAN_SDK 或在命令行 `set VULKAN_SDK=`
