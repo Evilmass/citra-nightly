@@ -69,6 +69,11 @@ public:
         return use_new_hash;
     }
 
+    /// Clears pending async upload callbacks to prevent dangling references.
+    void ClearAsyncUploads() {
+        async_uploads.clear();
+    }
+
 private:
     /// Parses the custom texture filename (hash, material type, etc).
     bool ParseFilename(const FileUtil::FSTEntry& file, CustomTexture* texture);
