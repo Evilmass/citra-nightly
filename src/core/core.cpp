@@ -424,6 +424,7 @@ System::ResultStatus System::Init(Frontend::EmuWindow& emu_window,
         registered_image_interface = std::make_shared<Frontend::ImageInterface>();
     }
 
+    // Preserve custom_tex_manager during deserialization to avoid rescanning textures
     if (!custom_tex_manager) {
         custom_tex_manager = std::make_unique<VideoCore::CustomTexManager>(*this);
     }
