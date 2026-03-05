@@ -223,6 +223,9 @@ public:
         // Stores a scaling for the internal clockspeed. Changing this number results in
         // under/overclocking the guest cpu
         double cpu_clock_scale = 1.0;
+        // Fast-path flag: true when cpu_clock_scale == 1.0 (100% clock speed),
+        // allowing AddTicks to skip the floating-point multiply.
+        // Updated together with cpu_clock_scale in UpdateClockSpeed().
         bool is_default_clock_scale = true;
 
         template <class Archive>
