@@ -5,6 +5,7 @@
 #include <bit>
 #include <functional>
 #include "common/common_types.h"
+#include "common/settings.h"
 #include "common/string_literal.h"
 #include "core/arm/dynarmic/arm_tick_counts.h"
 
@@ -473,6 +474,10 @@ const std::array thumb_matchers{
 namespace Core {
 
 u64 TicksForInstruction(bool is_thumb, u32 instruction) {
+    if (Settings::values.enable_custom_cpu_ticks) {
+        return Settings::values.custom_cpu_ticks.GetValue();
+    }
+
     if (is_thumb) {
         return 1;
     }

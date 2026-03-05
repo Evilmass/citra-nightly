@@ -102,9 +102,9 @@ cpu_clock_percentage =
 enable_custom_cpu_ticks =
 
 # Set Custom CPU ticks
-# Set a custom value of CPU ticks. Higher values can increase performance but if they're too high,
-# it may cause the game to freeze. A range of 77-21000 is recommended.
-enable_custom_cpu_ticks =
+# Set a custom value of CPU ticks per instruction. Higher values can increase performance but
+# if they're too high, it may cause the game to freeze. A range of 77-21000 is recommended.
+custom_cpu_ticks =
 
 [Renderer]
 # Whether to render using OpenGL or Software
