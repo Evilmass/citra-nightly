@@ -223,6 +223,7 @@ public:
         // Stores a scaling for the internal clockspeed. Changing this number results in
         // under/overclocking the guest cpu
         double cpu_clock_scale = 1.0;
+        bool is_default_clock_scale = true;
 
         template <class Archive>
         void serialize(Archive& ar, const unsigned int) {

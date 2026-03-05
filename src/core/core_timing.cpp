@@ -32,6 +32,7 @@ Timing::Timing(std::size_t num_cores, u32 cpu_clock_percentage) {
 void Timing::UpdateClockSpeed(u32 cpu_clock_percentage) {
     for (auto& timer : timers) {
         timer->cpu_clock_scale = 100.0 / cpu_clock_percentage;
+        timer->is_default_clock_scale = (cpu_clock_percentage == 100);
     }
 }
 
@@ -147,10 +148,14 @@ u64 Timing::Timer::GetTicks() const {
 }
 
 void Timing::Timer::AddTicks(u64 ticks) {
-    downcount -= static_cast<u64>((Settings::values.enable_custom_cpu_ticks
-                                       ? Settings::values.custom_cpu_ticks.GetValue()
-                                       : ticks) *
-                                  cpu_clock_scale);
+    if (Settings::values.enable_custom_cpu_ticks) {
+        ticks = Settings::values.custom_cpu_ticks.GetValue();
+    }
+    if (is_default_clock_scale) {
+        downcount -= ticks;
+    } else {
+        downcount -= static_cast<u64>(ticks * cpu_clock_scale);
+    }
 }
 
 u64 Timing::Timer::GetIdleTicks() const {
