@@ -517,20 +517,16 @@ static void P3DInterruptCallback(std::uintptr_t user_data, s64 cycles_late) {
 }
 
 /// Approximate number of ARM11 cycles the GPU takes to render a frame on real hardware.
-/// This value represents about 2ms of GPU rendering time at 268MHz, which is a conservative
-/// estimate for typical 3DS game frames.
-static constexpr s64 GPU_RENDER_TICKS = frame_ticks / 8;
+/// A typical 3DS GPU frame takes around 2ms to render.
+static constexpr s64 GPU_RENDER_TICKS = msToCycles(2);
 
 void ScheduleP3DInterrupt() {
     // Schedule the P3D interrupt to fire after a delay simulating GPU rendering time.
     // This prevents the game render thread from seeing an instant GPU completion, which
     // would cause it to immediately submit the next frame without giving the logic thread
     // time to run (resulting in hundreds of rendered frames with no logic updates).
-    Core::Timing& timing = Core::System::GetInstance().CoreTiming();
-    // Remove any pending P3D event so that if multiple command lists are submitted
-    // in quick succession, only the last one's delay is used.
-    timing.RemoveEvent(p3d_interrupt_event);
-    timing.ScheduleEvent(GPU_RENDER_TICKS, p3d_interrupt_event);
+    Core::System::GetInstance().CoreTiming().ScheduleEvent(GPU_RENDER_TICKS,
+                                                          p3d_interrupt_event);
 }
 
 /// Update hardware
