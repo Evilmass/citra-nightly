@@ -7,6 +7,7 @@
 #include "common/archives.h"
 #include "common/bit_field.h"
 #include "common/microprofile.h"
+#include "common/settings.h"
 #include "common/swap.h"
 #include "core/core.h"
 #include "core/file_sys/plugin_3gx.h"
@@ -641,6 +642,8 @@ void GSP_GPU::SetLcdForceBlack(Kernel::HLERequestContext& ctx) {
 void GSP_GPU::TriggerCmdReqQueue(Kernel::HLERequestContext& ctx) {
     IPC::RequestParser rp(ctx);
 
+    bool requires_delay = false;
+
     // Iterate through each thread's command queue...
     for (unsigned thread_id = 0; thread_id < 0x4; ++thread_id) {
         CommandBuffer* command_buffer = (CommandBuffer*)GetCommandBuffer(shared_memory, thread_id);
@@ -648,6 +651,12 @@ void GSP_GPU::TriggerCmdReqQueue(Kernel::HLERequestContext& ctx) {
         // Iterate through each command...
         for (unsigned i = 0; i < command_buffer->number_commands; ++i) {
             g_debugger.GXCommandProcessed((u8*)&command_buffer->commands[i]);
+
+            if (command_buffer->commands[i].id == CommandId::SUBMIT_GPU_CMDLIST &&
+                !requires_delay &&
+                Settings::values.delay_game_render_thread_us.GetValue() != 0) {
+                requires_delay = true;
+            }
 
             // Decode and execute command
             ExecuteCommand(command_buffer->commands[i], thread_id);
@@ -659,6 +668,13 @@ void GSP_GPU::TriggerCmdReqQueue(Kernel::HLERequestContext& ctx) {
 
     IPC::RequestBuilder rb = rp.MakeBuilder(1, 0);
     rb.Push(RESULT_SUCCESS);
+
+    if (requires_delay) {
+        ctx.SleepClientThread(
+            "gsp::TriggerCmdReqQueue",
+            std::chrono::microseconds(Settings::values.delay_game_render_thread_us.GetValue()),
+            nullptr);
+    }
 }
 
 void GSP_GPU::ImportDisplayCaptureInfo(Kernel::HLERequestContext& ctx) {
