@@ -335,6 +335,11 @@ void Read(T& var, const u32 addr);
 template <typename T>
 void Write(u32 addr, const T data);
 
+/// Schedules the P3D interrupt to fire after a delay that simulates GPU rendering time.
+/// This prevents the game render thread from immediately submitting the next frame,
+/// giving the logic thread time to execute between frames.
+void ScheduleP3DInterrupt();
+
 /// Initialize hardware
 void Init(Memory::MemorySystem& memory);
 

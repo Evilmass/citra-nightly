@@ -11,7 +11,6 @@
 #include "common/logging/log.h"
 #include "common/microprofile.h"
 #include "common/vector_math.h"
-#include "core/hle/service/gsp/gsp.h"
 #include "core/hw/gpu.h"
 #include "core/memory.h"
 #include "core/tracer/recorder.h"
@@ -143,7 +142,10 @@ static void WritePicaReg(u32 id, u32 value, u32 mask) {
     switch (id) {
     // Trigger IRQ
     case PICA_REG_INDEX(trigger_irq):
-        Service::GSP::SignalInterrupt(Service::GSP::InterruptId::P3D);
+        // Schedule the P3D interrupt with a delay to simulate GPU rendering time.
+        // This prevents the render thread from immediately submitting the next frame,
+        // giving the game logic thread time to execute between frames.
+        GPU::ScheduleP3DInterrupt();
         break;
 
     case PICA_REG_INDEX(pipeline.triangle_topology):

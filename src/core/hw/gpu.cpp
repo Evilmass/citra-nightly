@@ -32,6 +32,7 @@ Memory::MemorySystem* g_memory;
 
 /// Event id for CoreTiming
 static Core::TimingEventType* vblank_event;
+static Core::TimingEventType* p3d_interrupt_event;
 
 template <typename T>
 inline void Read(T& var, const u32 raw_addr) {
@@ -510,6 +511,24 @@ template void Write<u32>(u32 addr, const u32 data);
 template void Write<u16>(u32 addr, const u16 data);
 template void Write<u8>(u32 addr, const u8 data);
 
+/// Callback for the delayed P3D interrupt event
+static void P3DInterruptCallback(std::uintptr_t user_data, s64 cycles_late) {
+    Service::GSP::SignalInterrupt(Service::GSP::InterruptId::P3D);
+}
+
+/// Approximate number of ARM11 cycles the GPU takes to render a frame on real hardware.
+/// A typical 3DS GPU frame takes around 2ms to render.
+static constexpr s64 GPU_RENDER_TICKS = msToCycles(2);
+
+void ScheduleP3DInterrupt() {
+    // Schedule the P3D interrupt to fire after a delay simulating GPU rendering time.
+    // This prevents the game render thread from seeing an instant GPU completion, which
+    // would cause it to immediately submit the next frame without giving the logic thread
+    // time to run (resulting in hundreds of rendered frames with no logic updates).
+    Core::System::GetInstance().CoreTiming().ScheduleEvent(GPU_RENDER_TICKS,
+                                                          p3d_interrupt_event);
+}
+
 /// Update hardware
 static void VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {
     VideoCore::g_renderer->SwapBuffers();
@@ -559,6 +578,8 @@ void Init(Memory::MemorySystem& memory) {
 
     Core::Timing& timing = Core::System::GetInstance().CoreTiming();
     vblank_event = timing.RegisterEvent("GPU::VBlankCallback", VBlankCallback);
+    p3d_interrupt_event =
+        timing.RegisterEvent("GPU::P3DInterruptCallback", P3DInterruptCallback);
     timing.ScheduleEvent(frame_ticks, vblank_event);
 
     LOG_DEBUG(HW_GPU, "initialized OK");
