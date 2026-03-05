@@ -154,7 +154,7 @@ void Timing::Timer::AddTicks(u64 ticks) {
     if (is_default_clock_scale) [[likely]] {
         downcount -= static_cast<s64>(ticks);
     } else {
-        downcount -= static_cast<s64>(static_cast<u64>(ticks * cpu_clock_scale));
+        downcount -= static_cast<s64>(ticks * cpu_clock_scale);
     }
 }
 
