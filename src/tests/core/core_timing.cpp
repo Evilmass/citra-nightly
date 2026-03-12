@@ -196,4 +196,48 @@ TEST_CASE("CoreTiming[ChainScheduling]", "[core]") {
     REQUIRE(MAX_SLICE_LENGTH == timing.GetTimer(0)->GetDowncount());
 }
 
+namespace FixedCadenceSchedulingTest {
+static constexpr s64 period = 100;
+static std::array<s64, 3> observed_lateness{};
+static std::size_t callback_count = 0;
+static Core::Timing* timing = nullptr;
+static Core::TimingEventType* callback = nullptr;
+
+static void FixedCadenceCallback([[maybe_unused]] std::uintptr_t user_data, s64 cycles_late) {
+    REQUIRE(callback_count < observed_lateness.size());
+    observed_lateness[callback_count++] = cycles_late;
+
+    if (callback_count < observed_lateness.size()) {
+        timing->ScheduleEvent(period, callback);
+    }
+}
+} // namespace FixedCadenceSchedulingTest
+
+TEST_CASE("CoreTiming[FixedCadenceScheduling]", "[core]") {
+    using namespace FixedCadenceSchedulingTest;
+
+    Core::Timing local_timing(1, 100);
+    timing = &local_timing;
+    callback_count = 0;
+    observed_lateness.fill(-1);
+    callback = timing->RegisterEvent("callbackFixedCadence", FixedCadenceCallback);
+
+    timing->GetTimer(0)->Advance();
+    timing->GetTimer(0)->SetNextSlice();
+
+    timing->ScheduleEvent(period, callback);
+    REQUIRE(period == timing->GetTimer(0)->GetDowncount());
+
+    for (std::size_t i = 0; i < observed_lateness.size(); ++i) {
+        timing->GetTimer(0)->AddTicks(timing->GetTimer(0)->GetDowncount() + 10);
+        timing->GetTimer(0)->Advance();
+        timing->GetTimer(0)->SetNextSlice();
+
+        REQUIRE(i + 1 == callback_count);
+        REQUIRE(10 == observed_lateness[i]);
+        REQUIRE((i + 1 < observed_lateness.size() ? period : MAX_SLICE_LENGTH) ==
+                timing->GetTimer(0)->GetDowncount());
+    }
+}
+
 // TODO: Add tests for multiple timers

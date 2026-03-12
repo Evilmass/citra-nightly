@@ -530,7 +530,7 @@ void ScheduleP3DInterrupt() {
 }
 
 /// Update hardware
-static void VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {
+static void VBlankCallback(std::uintptr_t user_data, [[maybe_unused]] s64 cycles_late) {
     VideoCore::g_renderer->SwapBuffers();
 
     // Signal to GSP that GPU interrupt has occurred
@@ -541,8 +541,10 @@ static void VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {
     Service::GSP::SignalInterrupt(Service::GSP::InterruptId::PDC0);
     Service::GSP::SignalInterrupt(Service::GSP::InterruptId::PDC1);
 
-    // Reschedule recurrent event
-    Core::System::GetInstance().CoreTiming().ScheduleEvent(frame_ticks - cycles_late, vblank_event);
+    // Keep VBlank on a fixed cadence. Carrying lateness into the next frame makes the display
+    // cadence oscillate under load, which is visible as intermittent frame drops and stutter when
+    // games such as MHXX are uncapped to 60 FPS.
+    Core::System::GetInstance().CoreTiming().ScheduleEvent(frame_ticks, vblank_event);
 }
 
 /// Initialize hardware
