@@ -10,6 +10,7 @@
 #include "common/file_util.h"
 #include "core/core.h"
 #include "core/core_timing.h"
+#include "video_core/gpu.h"
 
 // Numbers are chosen randomly to make sure the correct one is given.
 static constexpr std::array<u64, 5> CB_IDS{{42, 144, 93, 1026, UINT64_C(0xFFFF7FFFF7FFFF)}};
@@ -194,6 +195,13 @@ TEST_CASE("CoreTiming[ChainScheduling]", "[core]") {
     timing.GetTimer(0)->SetNextSlice(); // cb_rs
     REQUIRE(0 == reschedules);
     REQUIRE(MAX_SLICE_LENGTH == timing.GetTimer(0)->GetDowncount());
+}
+
+TEST_CASE("CoreTiming[FrameRateConstants]", "[core]") {
+    REQUIRE(VideoCore::FRAME_TICKS == 4468531ull);
+    REQUIRE(SCREEN_REFRESH_RATE == Catch::Approx(60.0).margin(0.00001));
+    REQUIRE(SCREEN_REFRESH_RATE ==
+            Catch::Approx(BASE_CLOCK_RATE_ARM11 / static_cast<double>(VideoCore::FRAME_TICKS)));
 }
 
 // TODO: Add tests for multiple timers
