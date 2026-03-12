@@ -196,47 +196,40 @@ TEST_CASE("CoreTiming[ChainScheduling]", "[core]") {
     REQUIRE(MAX_SLICE_LENGTH == timing.GetTimer(0)->GetDowncount());
 }
 
-namespace FixedCadenceSchedulingTest {
-static constexpr s64 period = 100;
-static std::array<s64, 3> observed_lateness{};
-static std::size_t callback_count = 0;
-static Core::Timing* timing = nullptr;
-static Core::TimingEventType* callback = nullptr;
-
-static void FixedCadenceCallback([[maybe_unused]] std::uintptr_t user_data, s64 cycles_late) {
-    REQUIRE(callback_count < observed_lateness.size());
-    observed_lateness[callback_count++] = cycles_late;
-
-    if (callback_count < observed_lateness.size()) {
-        timing->ScheduleEvent(period, callback);
-    }
-}
-} // namespace FixedCadenceSchedulingTest
-
 TEST_CASE("CoreTiming[FixedCadenceScheduling]", "[core]") {
-    using namespace FixedCadenceSchedulingTest;
-
+    static constexpr s64 period = 100;
+    static constexpr s64 unset_lateness = -1;
     Core::Timing local_timing(1, 100);
-    timing = &local_timing;
-    callback_count = 0;
-    observed_lateness.fill(-1);
-    callback = timing->RegisterEvent("callbackFixedCadence", FixedCadenceCallback);
+    std::array<s64, 3> observed_lateness{};
+    std::size_t callback_count = 0;
+    Core::TimingEventType* callback = nullptr;
+    observed_lateness.fill(unset_lateness);
+    callback = local_timing.RegisterEvent(
+        "callbackFixedCadence", [&](std::uintptr_t user_data, s64 cycles_late) {
+            REQUIRE(0U == user_data);
+            REQUIRE(callback_count < observed_lateness.size());
+            observed_lateness[callback_count++] = cycles_late;
 
-    timing->GetTimer(0)->Advance();
-    timing->GetTimer(0)->SetNextSlice();
+            if (callback_count < observed_lateness.size()) {
+                local_timing.ScheduleEvent(period, callback);
+            }
+        });
 
-    timing->ScheduleEvent(period, callback);
-    REQUIRE(period == timing->GetTimer(0)->GetDowncount());
+    local_timing.GetTimer(0)->Advance();
+    local_timing.GetTimer(0)->SetNextSlice();
+
+    local_timing.ScheduleEvent(period, callback);
+    REQUIRE(period == local_timing.GetTimer(0)->GetDowncount());
 
     for (std::size_t i = 0; i < observed_lateness.size(); ++i) {
-        timing->GetTimer(0)->AddTicks(timing->GetTimer(0)->GetDowncount() + 10);
-        timing->GetTimer(0)->Advance();
-        timing->GetTimer(0)->SetNextSlice();
+        local_timing.GetTimer(0)->AddTicks(local_timing.GetTimer(0)->GetDowncount() + 10);
+        local_timing.GetTimer(0)->Advance();
+        local_timing.GetTimer(0)->SetNextSlice();
 
         REQUIRE(i + 1 == callback_count);
         REQUIRE(10 == observed_lateness[i]);
         REQUIRE((i + 1 < observed_lateness.size() ? period : MAX_SLICE_LENGTH) ==
-                timing->GetTimer(0)->GetDowncount());
+                local_timing.GetTimer(0)->GetDowncount());
     }
 }
 
