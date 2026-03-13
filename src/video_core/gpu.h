@@ -77,6 +77,9 @@ public:
     /// Synchronizes fixed function renderer state with PICA registers.
     void Sync();
 
+    /// Waits for the GPU thread to finish all pending commands.
+    void WaitForGPU();
+
     /// Returns a mutable reference to the renderer.
     [[nodiscard]] VideoCore::RendererBase& Renderer();
 
@@ -100,6 +103,27 @@ private:
     void MemoryTransfer();
 
     void VBlankCallback(uintptr_t user_data, s64 cycles_late);
+
+    /// Starts the GPU worker thread.
+    void StartGPUThread();
+
+    /// Stops the GPU worker thread.
+    void StopGPUThread();
+
+    /// GPU worker thread function.
+    void GPUThreadFunc();
+
+    /// Pushes a GSP command to the async processing queue.
+    void PushCommand(const Service::GSP::Command& command);
+
+    /// Delivers pending interrupts on the CPU thread.
+    void DrainInterrupts();
+
+    /// Pushes an interrupt for deferred delivery (called from GPU thread).
+    void PushInterrupt(Service::GSP::InterruptId interrupt_id);
+
+    /// Executes a GSP command on the GPU thread context.
+    void ExecuteOnGPUThread(const Service::GSP::Command& command);
 
     friend class boost::serialization::access;
     template <class Archive>

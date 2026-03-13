@@ -2,8 +2,14 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+#include <thread>
+
 #include "common/archives.h"
 #include "common/microprofile.h"
+#include "common/settings.h"
 #include "core/core.h"
 #include "core/core_timing.h"
 #include "core/hle/service/gsp/gsp_gpu.h"
@@ -22,6 +28,9 @@ namespace VideoCore {
 constexpr VAddr VADDR_LCD = 0x1ED02000;
 constexpr VAddr VADDR_GPU = 0x1EF00000;
 
+/// Ticks between interrupt delivery checks for async GPU mode.
+constexpr s64 GPU_INTERRUPT_CHECK_TICKS = 8000;
+
 MICROPROFILE_DEFINE(GPU_DisplayTransfer, "GPU", "DisplayTransfer", MP_RGB(100, 100, 255));
 MICROPROFILE_DEFINE(GPU_CmdlistProcessing, "GPU", "Cmdlist Processing", MP_RGB(100, 255, 100));
 
@@ -37,6 +46,20 @@ struct GPU::Impl {
     std::unique_ptr<SwRenderer::SwBlitter> sw_blitter;
     Core::TimingEventType* vblank_event;
     Service::GSP::InterruptHandler signal_interrupt;
+
+    // Async GPU members
+    bool is_async = false;
+    std::thread gpu_thread;
+    std::mutex command_mutex;
+    std::condition_variable command_cv;
+    std::condition_variable drain_cv;
+    std::queue<Service::GSP::Command> command_queue;
+    std::mutex interrupt_mutex;
+    std::vector<Service::GSP::InterruptId> pending_interrupts;
+    std::atomic<bool> has_pending_interrupts{false};
+    std::atomic<bool> gpu_running{false};
+    bool shutdown = false;
+    Core::TimingEventType* interrupt_check_event = nullptr;
 
     explicit Impl(Core::System& system, Frontend::EmuWindow& emu_window,
                   Frontend::EmuWindow* secondary_window)
@@ -58,9 +81,26 @@ GPU::GPU(Core::System& system, Frontend::EmuWindow& emu_window,
 
     // Bind the rasterizer to the PICA GPU
     impl->pica.BindRasterizer(impl->rasterizer);
+
+    // Initialize async GPU if enabled
+    impl->is_async = Settings::values.async_gpu_emulation.GetValue();
+    if (impl->is_async) {
+        impl->interrupt_check_event = impl->timing.RegisterEvent(
+            "GPU::CheckPendingInterrupts",
+            [this](uintptr_t, s64) {
+                DrainInterrupts();
+                if (impl->is_async && !impl->shutdown) {
+                    impl->timing.ScheduleEvent(GPU_INTERRUPT_CHECK_TICKS,
+                                               impl->interrupt_check_event);
+                }
+            });
+        impl->timing.ScheduleEvent(GPU_INTERRUPT_CHECK_TICKS, impl->interrupt_check_event);
+    }
 }
 
-GPU::~GPU() = default;
+GPU::~GPU() {
+    StopGPUThread();
+}
 
 PAddr GPU::VirtualToPhysicalAddress(VAddr addr) {
     if (addr == 0) {
@@ -89,22 +129,43 @@ PAddr GPU::VirtualToPhysicalAddress(VAddr addr) {
 
 void GPU::SetInterruptHandler(Service::GSP::InterruptHandler handler) {
     impl->signal_interrupt = handler;
-    impl->pica.SetInterruptHandler(handler);
+
+    if (impl->is_async) {
+        // In async mode, use deferred interrupt delivery for thread safety
+        impl->pica.SetInterruptHandler(
+            [this](Service::GSP::InterruptId id) { PushInterrupt(id); });
+    } else {
+        impl->pica.SetInterruptHandler(handler);
+    }
+
+    // Start the GPU thread now that the interrupt handler is available
+    if (impl->is_async && !impl->gpu_thread.joinable()) {
+        StartGPUThread();
+    }
 }
 
 void GPU::FlushRegion(PAddr addr, u32 size) {
+    WaitForGPU();
     impl->rasterizer->FlushRegion(addr, size);
 }
 
 void GPU::InvalidateRegion(PAddr addr, u32 size) {
+    WaitForGPU();
     impl->rasterizer->InvalidateRegion(addr, size);
 }
 
 void GPU::ClearAll(bool flush) {
+    WaitForGPU();
     impl->rasterizer->ClearAll(flush);
 }
 
 void GPU::Execute(const Service::GSP::Command& command) {
+    if (impl->is_async) {
+        PushCommand(command);
+        return;
+    }
+
+    // Synchronous execution
     using Service::GSP::CommandId;
     auto& regs = impl->pica.regs;
 
@@ -309,6 +370,7 @@ void GPU::WriteReg(VAddr addr, u32 data) {
 }
 
 void GPU::Sync() {
+    WaitForGPU();
     impl->renderer->Sync();
 }
 
@@ -363,10 +425,12 @@ void GPU::MemoryFill(u32 index) {
     // It seems that it won't signal interrupt if "address_start" is zero.
     // TODO: hwtest this
     if (config.GetStartAddress() != 0) {
-        if (!index) {
-            impl->signal_interrupt(Service::GSP::InterruptId::PSC0);
+        const auto interrupt_id =
+            !index ? Service::GSP::InterruptId::PSC0 : Service::GSP::InterruptId::PSC1;
+        if (impl->is_async) {
+            PushInterrupt(interrupt_id);
         } else {
-            impl->signal_interrupt(Service::GSP::InterruptId::PSC1);
+            impl->signal_interrupt(interrupt_id);
         }
     }
 
@@ -403,11 +467,19 @@ void GPU::MemoryTransfer() {
 
     // Complete transfer.
     config.trigger.Assign(0);
-    impl->signal_interrupt(Service::GSP::InterruptId::PPF);
+    if (impl->is_async) {
+        PushInterrupt(Service::GSP::InterruptId::PPF);
+    } else {
+        impl->signal_interrupt(Service::GSP::InterruptId::PPF);
+    }
 }
 
 void GPU::VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {
-    // Present renderered frame.
+    // Synchronize with GPU thread before presenting
+    WaitForGPU();
+    DrainInterrupts();
+
+    // Present rendered frame.
     impl->renderer->SwapBuffers();
 
     // Signal to GSP that GPU interrupt has occurred
@@ -418,9 +490,193 @@ void GPU::VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {
     impl->timing.ScheduleEvent(FRAME_TICKS - cycles_late, impl->vblank_event);
 }
 
+void GPU::StartGPUThread() {
+    impl->shutdown = false;
+    impl->gpu_running.store(false);
+    impl->gpu_thread = std::thread([this] { GPUThreadFunc(); });
+}
+
+void GPU::StopGPUThread() {
+    if (!impl->gpu_thread.joinable()) {
+        return;
+    }
+
+    {
+        std::lock_guard lock(impl->command_mutex);
+        impl->shutdown = true;
+    }
+    impl->command_cv.notify_one();
+    impl->gpu_thread.join();
+
+    // Drain any remaining interrupts
+    DrainInterrupts();
+}
+
+void GPU::GPUThreadFunc() {
+    while (true) {
+        Service::GSP::Command command;
+        {
+            std::unique_lock lock(impl->command_mutex);
+            impl->gpu_running.store(false);
+            impl->drain_cv.notify_all();
+            impl->command_cv.wait(lock,
+                                  [this] { return !impl->command_queue.empty() || impl->shutdown; });
+            if (impl->shutdown) {
+                return;
+            }
+            command = impl->command_queue.front();
+            impl->command_queue.pop();
+            impl->gpu_running.store(true);
+        }
+
+        // Process the command on the GPU thread using the same logic as synchronous Execute,
+        // but with deferred interrupt delivery.
+        ExecuteOnGPUThread(command);
+    }
+}
+
+void GPU::ExecuteOnGPUThread(const Service::GSP::Command& command) {
+    using Service::GSP::CommandId;
+    auto& regs = impl->pica.regs;
+
+    switch (command.id) {
+    case CommandId::RequestDma: {
+        impl->system.Memory().RasterizerFlushVirtualRegion(
+            command.dma_request.source_address, command.dma_request.size, Memory::FlushMode::Flush);
+        impl->system.Memory().RasterizerFlushVirtualRegion(command.dma_request.dest_address,
+                                                           command.dma_request.size,
+                                                           Memory::FlushMode::Invalidate);
+
+        const auto process = impl->system.Kernel().GetCurrentProcess();
+        impl->memory.CopyBlock(*process, command.dma_request.dest_address,
+                               command.dma_request.source_address, command.dma_request.size);
+        PushInterrupt(Service::GSP::InterruptId::DMA);
+        break;
+    }
+    case CommandId::SubmitCmdList: {
+        auto& params = command.submit_gpu_cmdlist;
+        auto& cmdbuffer = regs.internal.pipeline.command_buffer;
+
+        cmdbuffer.addr[0].Assign(VirtualToPhysicalAddress(params.address) >> 3);
+        cmdbuffer.size[0].Assign(params.size >> 3);
+        cmdbuffer.trigger[0] = 1;
+
+        SubmitCmdList(0);
+        break;
+    }
+    case CommandId::MemoryFill: {
+        auto& params = command.memory_fill;
+        auto& memfill = regs.memory_fill_config;
+
+        if (params.start1 != 0) {
+            memfill[0].address_start = VirtualToPhysicalAddress(params.start1) >> 3;
+            memfill[0].address_end = VirtualToPhysicalAddress(params.end1) >> 3;
+            memfill[0].value_32bit = params.value1;
+            memfill[0].control = params.control1;
+            MemoryFill(0);
+        }
+        if (params.start2 != 0) {
+            memfill[1].address_start = VirtualToPhysicalAddress(params.start2) >> 3;
+            memfill[1].address_end = VirtualToPhysicalAddress(params.end2) >> 3;
+            memfill[1].value_32bit = params.value2;
+            memfill[1].control = params.control2;
+            MemoryFill(1);
+        }
+        break;
+    }
+    case CommandId::DisplayTransfer: {
+        auto& params = command.display_transfer;
+        auto& display_transfer = regs.display_transfer_config;
+
+        display_transfer.input_address = VirtualToPhysicalAddress(params.in_buffer_address) >> 3;
+        display_transfer.output_address = VirtualToPhysicalAddress(params.out_buffer_address) >> 3;
+        display_transfer.input_size = params.in_buffer_size;
+        display_transfer.output_size = params.out_buffer_size;
+        display_transfer.flags = params.flags;
+        display_transfer.trigger.Assign(1);
+
+        MemoryTransfer();
+        break;
+    }
+    case CommandId::TextureCopy: {
+        auto& params = command.texture_copy;
+        auto& texture_copy = regs.display_transfer_config;
+
+        texture_copy.input_address = VirtualToPhysicalAddress(params.in_buffer_address) >> 3;
+        texture_copy.output_address = VirtualToPhysicalAddress(params.out_buffer_address) >> 3;
+        texture_copy.texture_copy.size = params.size;
+        texture_copy.texture_copy.input_size = params.in_width_gap;
+        texture_copy.texture_copy.output_size = params.out_width_gap;
+        texture_copy.flags = params.flags;
+        texture_copy.trigger.Assign(1);
+
+        MemoryTransfer();
+        break;
+    }
+    case CommandId::CacheFlush: {
+        break;
+    }
+    default:
+        LOG_ERROR(HW_GPU, "Unknown command {:#08X}", command.id.Value());
+    }
+
+    // Notify debugger that a GSP command was processed.
+    if (impl->debug_context) {
+        impl->debug_context->OnEvent(Pica::DebugContext::Event::GSPCommandProcessed, &command);
+    }
+}
+
+void GPU::PushCommand(const Service::GSP::Command& command) {
+    {
+        std::lock_guard lock(impl->command_mutex);
+        impl->command_queue.push(command);
+    }
+    impl->command_cv.notify_one();
+}
+
+void GPU::WaitForGPU() {
+    if (!impl->is_async) {
+        return;
+    }
+
+    std::unique_lock lock(impl->command_mutex);
+    impl->drain_cv.wait(lock,
+                        [this] { return impl->command_queue.empty() && !impl->gpu_running.load(); });
+}
+
+void GPU::PushInterrupt(Service::GSP::InterruptId interrupt_id) {
+    std::lock_guard lock(impl->interrupt_mutex);
+    impl->pending_interrupts.push_back(interrupt_id);
+    impl->has_pending_interrupts.store(true, std::memory_order_release);
+}
+
+void GPU::DrainInterrupts() {
+    if (!impl->has_pending_interrupts.load(std::memory_order_acquire)) {
+        return;
+    }
+
+    std::vector<Service::GSP::InterruptId> interrupts;
+    {
+        std::lock_guard lock(impl->interrupt_mutex);
+        interrupts = std::move(impl->pending_interrupts);
+        impl->pending_interrupts.clear();
+        impl->has_pending_interrupts.store(false, std::memory_order_release);
+    }
+
+    for (const auto interrupt_id : interrupts) {
+        impl->signal_interrupt(interrupt_id);
+    }
+}
+
 template <class Archive>
 void GPU::serialize(Archive& ar, const u32 file_version) {
+    // Stop the GPU thread for consistent state during serialization
+    StopGPUThread();
     ar & impl->pica;
+    // Restart the GPU thread after serialization
+    if (impl->is_async) {
+        StartGPUThread();
+    }
 }
 
 SERIALIZE_IMPL(GPU)

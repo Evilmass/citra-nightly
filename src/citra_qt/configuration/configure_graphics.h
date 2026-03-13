@@ -41,6 +41,7 @@ private:
     ConfigurationShared::CheckState use_vsync_new;
     ConfigurationShared::CheckState async_shader_compilation;
     ConfigurationShared::CheckState async_presentation;
+    ConfigurationShared::CheckState async_gpu_emulation;
     ConfigurationShared::CheckState spirv_shader_gen;
     std::unique_ptr<Ui::ConfigureGraphics> ui;
     QColor bg_color;
