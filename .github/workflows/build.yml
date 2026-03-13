@@ -33,8 +33,6 @@ jobs:
         shell: ${{ (matrix.target == 'msys2' && 'msys2') || 'bash' }} {0}
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
-      CCACHE_COMPILERCHECK: content
-      CCACHE_SLOPPINESS: time_macros
       OS: windows
       TARGET: ${{ matrix.target }}
     steps:
@@ -52,6 +50,14 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
       - name: Install extra tools (MSVC)
         run: choco install ccache ninja wget
+      - name: Set up Vulkan SDK (MSVC)
+        uses: humbletim/setup-vulkan-sdk@v1.2.1
+        with:
+          vulkan-query-version: 1.4.304.1
+          vulkan-components: SPIRV-Tools, Glslang
+          vulkan-use-cache: true
+      - name: Test glslang
+        run: glslang --version || glslangValidator --version
       - name: Disable line ending translation
         run: git config --global core.autocrlf input
       - name: Build
