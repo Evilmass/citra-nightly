@@ -93,6 +93,10 @@ public:
     [[nodiscard]] GraphicsDebugger& Debugger();
 
 private:
+    void ScheduleP3DInterrupt();
+
+    void P3DInterruptCallback(uintptr_t user_data, s64 cycles_late);
+
     void SubmitCmdList(u32 index);
 
     void MemoryFill(u32 index);
