@@ -21,7 +21,10 @@ namespace VideoCore {
 
 constexpr VAddr VADDR_LCD = 0x1ED02000;
 constexpr VAddr VADDR_GPU = 0x1EF00000;
-constexpr s64 GPU_RENDER_TICKS = msToCycles(2);
+// Approximate GPU completion latency measured/used to keep P3D signaling asynchronous.
+constexpr int GPU_RENDER_DELAY_MS = 2;
+constexpr s64 GPU_RENDER_TICKS =
+    BASE_CLOCK_RATE_ARM11 * static_cast<s64>(GPU_RENDER_DELAY_MS) / 1000;
 
 MICROPROFILE_DEFINE(GPU_DisplayTransfer, "GPU", "DisplayTransfer", MP_RGB(100, 100, 255));
 MICROPROFILE_DEFINE(GPU_CmdlistProcessing, "GPU", "Cmdlist Processing", MP_RGB(100, 255, 100));
@@ -430,14 +433,15 @@ void GPU::ScheduleP3DInterrupt() {
     impl->timing.ScheduleEvent(GPU_RENDER_TICKS, impl->p3d_interrupt_event);
 }
 
-void GPU::P3DInterruptCallback(std::uintptr_t user_data, s64 cycles_late) {
+void GPU::P3DInterruptCallback([[maybe_unused]] uintptr_t user_data,
+                               [[maybe_unused]] s64 cycles_late) {
     if (impl->signal_interrupt) {
         impl->signal_interrupt(Service::GSP::InterruptId::P3D);
     }
 }
 
 void GPU::VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {
-    // Present renderered frame.
+    // Present rendered frame.
     impl->renderer->SwapBuffers();
 
     // Signal to GSP that GPU interrupt has occurred
