@@ -21,6 +21,7 @@ namespace VideoCore {
 
 constexpr VAddr VADDR_LCD = 0x1ED02000;
 constexpr VAddr VADDR_GPU = 0x1EF00000;
+// Delay P3D completion slightly to emulate non-instant GPU execution.
 constexpr s64 GPU_RENDER_TICKS = msToCycles(2);
 
 MICROPROFILE_DEFINE(GPU_DisplayTransfer, "GPU", "DisplayTransfer", MP_RGB(100, 100, 255));
@@ -354,7 +355,8 @@ void GPU::ScheduleP3DInterrupt() {
     impl->timing.ScheduleEvent(GPU_RENDER_TICKS, impl->p3d_interrupt_event);
 }
 
-void GPU::P3DInterruptCallback(std::uintptr_t, s64) {
+void GPU::P3DInterruptCallback([[maybe_unused]] uintptr_t user_data,
+                               [[maybe_unused]] s64 cycles_late) {
     if (impl->signal_interrupt) {
         impl->signal_interrupt(Service::GSP::InterruptId::P3D);
     }
