@@ -58,7 +58,7 @@ struct GPU::Impl {
     std::vector<Service::GSP::InterruptId> pending_interrupts;
     std::atomic<bool> has_pending_interrupts{false};
     std::atomic<bool> gpu_running{false};
-    bool shutdown = false;
+    std::atomic<bool> shutdown{false};
     Core::TimingEventType* interrupt_check_event = nullptr;
 
     explicit Impl(Core::System& system, Frontend::EmuWindow& emu_window,
@@ -89,7 +89,7 @@ GPU::GPU(Core::System& system, Frontend::EmuWindow& emu_window,
             "GPU::CheckPendingInterrupts",
             [this](uintptr_t, s64) {
                 DrainInterrupts();
-                if (impl->is_async && !impl->shutdown) {
+                if (impl->is_async && !impl->shutdown.load()) {
                     impl->timing.ScheduleEvent(GPU_INTERRUPT_CHECK_TICKS,
                                                impl->interrupt_check_event);
                 }
@@ -324,6 +324,9 @@ u32 GPU::ReadReg(VAddr addr) {
 }
 
 void GPU::WriteReg(VAddr addr, u32 data) {
+    // Synchronize with GPU thread before MMIO register writes to prevent data races
+    WaitForGPU();
+
     switch (addr & 0xFFFFF000) {
     case VADDR_LCD: {
         const u32 offset = addr - VADDR_LCD;
@@ -491,7 +494,7 @@ void GPU::VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {
 }
 
 void GPU::StartGPUThread() {
-    impl->shutdown = false;
+    impl->shutdown.store(false);
     impl->gpu_running.store(false);
     impl->gpu_thread = std::thread([this] { GPUThreadFunc(); });
 }
@@ -503,7 +506,7 @@ void GPU::StopGPUThread() {
 
     {
         std::lock_guard lock(impl->command_mutex);
-        impl->shutdown = true;
+        impl->shutdown.store(true);
     }
     impl->command_cv.notify_one();
     impl->gpu_thread.join();
@@ -519,9 +522,10 @@ void GPU::GPUThreadFunc() {
             std::unique_lock lock(impl->command_mutex);
             impl->gpu_running.store(false);
             impl->drain_cv.notify_all();
-            impl->command_cv.wait(lock,
-                                  [this] { return !impl->command_queue.empty() || impl->shutdown; });
-            if (impl->shutdown) {
+            impl->command_cv.wait(lock, [this] {
+                return !impl->command_queue.empty() || impl->shutdown.load();
+            });
+            if (impl->shutdown.load()) {
                 return;
             }
             command = impl->command_queue.front();
@@ -673,8 +677,8 @@ void GPU::serialize(Archive& ar, const u32 file_version) {
     // Stop the GPU thread for consistent state during serialization
     StopGPUThread();
     ar & impl->pica;
-    // Restart the GPU thread after serialization
-    if (impl->is_async) {
+    // Restart the GPU thread after serialization if the interrupt handler is available
+    if (impl->is_async && impl->signal_interrupt) {
         StartGPUThread();
     }
 }

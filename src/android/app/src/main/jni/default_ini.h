@@ -106,6 +106,10 @@ graphics_api =
 # 0: Off, 1: On (default)
 async_shader_compilation =
 
+# Whether to emulate GPU operations asynchronously on a separate thread
+# 0 (default): Off, 1: On
+async_gpu_emulation =
+
 # Whether to emit PICA fragment shader using SPIRV or GLSL (Vulkan only)
 # 0: GLSL, 1: SPIR-V (default)
 spirv_shader_gen =
