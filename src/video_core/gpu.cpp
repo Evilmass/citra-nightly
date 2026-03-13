@@ -21,6 +21,7 @@ namespace VideoCore {
 
 constexpr VAddr VADDR_LCD = 0x1ED02000;
 constexpr VAddr VADDR_GPU = 0x1EF00000;
+constexpr s64 GPU_RENDER_TICKS = msToCycles(2);
 
 MICROPROFILE_DEFINE(GPU_DisplayTransfer, "GPU", "DisplayTransfer", MP_RGB(100, 100, 255));
 MICROPROFILE_DEFINE(GPU_CmdlistProcessing, "GPU", "Cmdlist Processing", MP_RGB(100, 255, 100));
@@ -36,7 +37,9 @@ struct GPU::Impl {
     RasterizerInterface* rasterizer;
     std::unique_ptr<SwRenderer::SwBlitter> sw_blitter;
     Core::TimingEventType* vblank_event;
+    Core::TimingEventType* p3d_interrupt_event;
     Service::GSP::InterruptHandler signal_interrupt;
+    Service::GSP::InterruptHandler pica_interrupt_handler;
 
     explicit Impl(Core::System& system, Frontend::EmuWindow& emu_window,
                   Frontend::EmuWindow* secondary_window)
@@ -54,6 +57,9 @@ GPU::GPU(Core::System& system, Frontend::EmuWindow& emu_window,
     impl->vblank_event = impl->timing.RegisterEvent(
         "GPU::VBlankCallback",
         [this](uintptr_t user_data, s64 cycles_late) { VBlankCallback(user_data, cycles_late); });
+    impl->p3d_interrupt_event = impl->timing.RegisterEvent(
+        "GPU::P3DInterruptCallback",
+        [this](uintptr_t user_data, s64 cycles_late) { P3DInterruptCallback(user_data, cycles_late); });
     impl->timing.ScheduleEvent(FRAME_TICKS, impl->vblank_event);
 
     // Bind the rasterizer to the PICA GPU
@@ -88,8 +94,18 @@ PAddr GPU::VirtualToPhysicalAddress(VAddr addr) {
 }
 
 void GPU::SetInterruptHandler(Service::GSP::InterruptHandler handler) {
-    impl->signal_interrupt = handler;
-    impl->pica.SetInterruptHandler(handler);
+    impl->signal_interrupt = std::move(handler);
+    impl->pica_interrupt_handler = [this](Service::GSP::InterruptId interrupt_id) {
+        if (interrupt_id == Service::GSP::InterruptId::P3D) {
+            ScheduleP3DInterrupt();
+            return;
+        }
+
+        if (impl->signal_interrupt) {
+            impl->signal_interrupt(interrupt_id);
+        }
+    };
+    impl->pica.SetInterruptHandler(impl->pica_interrupt_handler);
 }
 
 void GPU::FlushRegion(PAddr addr, u32 size) {
@@ -404,6 +420,20 @@ void GPU::MemoryTransfer() {
     // Complete transfer.
     config.trigger.Assign(0);
     impl->signal_interrupt(Service::GSP::InterruptId::PPF);
+}
+
+void GPU::ScheduleP3DInterrupt() {
+    // The 3DS signals P3D asynchronously after a small delay instead of immediately when the
+    // command processor reaches trigger_irq. Delaying the interrupt keeps CPU/GPU ordering closer
+    // to hardware and gives games time to queue the next frame without stalling on instant GPU
+    // completion.
+    impl->timing.ScheduleEvent(GPU_RENDER_TICKS, impl->p3d_interrupt_event);
+}
+
+void GPU::P3DInterruptCallback(std::uintptr_t user_data, s64 cycles_late) {
+    if (impl->signal_interrupt) {
+        impl->signal_interrupt(Service::GSP::InterruptId::P3D);
+    }
 }
 
 void GPU::VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {

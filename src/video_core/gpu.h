@@ -99,6 +99,10 @@ private:
 
     void MemoryTransfer();
 
+    void ScheduleP3DInterrupt();
+
+    void P3DInterruptCallback(uintptr_t user_data, s64 cycles_late);
+
     void VBlankCallback(uintptr_t user_data, s64 cycles_late);
 
     friend class boost::serialization::access;
