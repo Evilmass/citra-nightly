@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <functional>
 #include <memory>
+#include <functional>
 #include <boost/serialization/access.hpp>
 
 #include "core/hle/service/gsp/gsp_interrupt.h"
@@ -17,6 +17,7 @@ struct FrameBufferInfo;
 
 namespace Core {
 class System;
+class TimingEventType;
 }
 
 namespace Pica {
@@ -36,6 +37,7 @@ namespace VideoCore {
 constexpr u64 FRAME_TICKS = 4481136ull;
 
 class GraphicsDebugger;
+class GPUCommandQueue;
 class RendererBase;
 
 /**
@@ -61,6 +63,9 @@ public:
 
     /// Executes the provided GSP command.
     void Execute(const Service::GSP::Command& command);
+
+    /// Waits for any pending async GPU work to complete.
+    void WaitForGPU();
 
     /// Updates GPU display framebuffer configuration using the specified parameters.
     void SetBufferSwap(u32 screen_id, const Service::GSP::FrameBufferInfo& info);
@@ -93,6 +98,12 @@ public:
     [[nodiscard]] GraphicsDebugger& Debugger();
 
 private:
+    void ExecuteCommand(const Service::GSP::Command& command);
+
+    void PushInterrupt(Service::GSP::InterruptId interrupt_id);
+
+    void DrainInterrupts(uintptr_t user_data, s64 cycles_late);
+
     void SubmitCmdList(u32 index);
 
     void MemoryFill(u32 index);
@@ -104,6 +115,8 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void serialize(Archive& ar, const u32 file_version);
+
+    friend class GPUCommandQueue;
 
 private:
     struct Impl;

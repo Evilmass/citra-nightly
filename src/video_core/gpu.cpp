@@ -2,14 +2,20 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <mutex>
+#include <queue>
+
 #include "common/archives.h"
 #include "common/microprofile.h"
+#include "common/settings.h"
 #include "core/core.h"
 #include "core/core_timing.h"
+#include "core/frontend/emu_window.h"
 #include "core/hle/service/gsp/gsp_gpu.h"
 #include "core/hle/service/plgldr/plgldr.h"
 #include "video_core/debug_utils/debug_utils.h"
 #include "video_core/gpu.h"
+#include "video_core/gpu_command_queue.h"
 #include "video_core/gpu_debugger.h"
 #include "video_core/pica/pica_core.h"
 #include "video_core/pica/regs_lcd.h"
@@ -21,6 +27,7 @@ namespace VideoCore {
 
 constexpr VAddr VADDR_LCD = 0x1ED02000;
 constexpr VAddr VADDR_GPU = 0x1EF00000;
+constexpr s64 GPU_INTERRUPT_CHECK_TICKS = 8000;
 
 MICROPROFILE_DEFINE(GPU_DisplayTransfer, "GPU", "DisplayTransfer", MP_RGB(100, 100, 255));
 MICROPROFILE_DEFINE(GPU_CmdlistProcessing, "GPU", "Cmdlist Processing", MP_RGB(100, 255, 100));
@@ -35,8 +42,12 @@ struct GPU::Impl {
     std::unique_ptr<RendererBase> renderer;
     RasterizerInterface* rasterizer;
     std::unique_ptr<SwRenderer::SwBlitter> sw_blitter;
+    std::unique_ptr<GPUCommandQueue> command_queue;
     Core::TimingEventType* vblank_event;
+    Core::TimingEventType* interrupt_drain_event;
     Service::GSP::InterruptHandler signal_interrupt;
+    std::mutex interrupt_mutex;
+    std::queue<Service::GSP::InterruptId> pending_interrupts;
 
     explicit Impl(Core::System& system, Frontend::EmuWindow& emu_window,
                   Frontend::EmuWindow* secondary_window)
@@ -54,13 +65,34 @@ GPU::GPU(Core::System& system, Frontend::EmuWindow& emu_window,
     impl->vblank_event = impl->timing.RegisterEvent(
         "GPU::VBlankCallback",
         [this](uintptr_t user_data, s64 cycles_late) { VBlankCallback(user_data, cycles_late); });
+    impl->interrupt_drain_event =
+        impl->timing.RegisterEvent("GPU::DrainInterrupts", [this](uintptr_t user_data,
+                                                                  s64 cycles_late) {
+            DrainInterrupts(user_data, cycles_late);
+        });
     impl->timing.ScheduleEvent(FRAME_TICKS, impl->vblank_event);
 
     // Bind the rasterizer to the PICA GPU
     impl->pica.BindRasterizer(impl->rasterizer);
+
+    if (Settings::values.async_gpu.GetValue() &&
+        Settings::values.graphics_api.GetValue() != Settings::GraphicsAPI::Vulkan) {
+        auto shared_context = emu_window.CreateSharedContext();
+        if (shared_context) {
+            shared_context->DoneCurrent();
+            impl->command_queue =
+                std::make_unique<GPUCommandQueue>(*this, std::move(shared_context));
+            impl->timing.ScheduleEvent(GPU_INTERRUPT_CHECK_TICKS, impl->interrupt_drain_event, 1);
+        }
+    }
 }
 
-GPU::~GPU() = default;
+GPU::~GPU() {
+    WaitForGPU();
+    DrainInterrupts(0, 0);
+    impl->timing.RemoveEvent(impl->vblank_event);
+    impl->timing.RemoveEvent(impl->interrupt_drain_event);
+}
 
 PAddr GPU::VirtualToPhysicalAddress(VAddr addr) {
     if (addr == 0) {
@@ -89,22 +121,44 @@ PAddr GPU::VirtualToPhysicalAddress(VAddr addr) {
 
 void GPU::SetInterruptHandler(Service::GSP::InterruptHandler handler) {
     impl->signal_interrupt = handler;
-    impl->pica.SetInterruptHandler(handler);
+    impl->pica.SetInterruptHandler([this](Service::GSP::InterruptId interrupt_id) {
+        PushInterrupt(interrupt_id);
+    });
 }
 
 void GPU::FlushRegion(PAddr addr, u32 size) {
+    WaitForGPU();
     impl->rasterizer->FlushRegion(addr, size);
 }
 
 void GPU::InvalidateRegion(PAddr addr, u32 size) {
+    WaitForGPU();
     impl->rasterizer->InvalidateRegion(addr, size);
 }
 
 void GPU::ClearAll(bool flush) {
+    WaitForGPU();
     impl->rasterizer->ClearAll(flush);
 }
 
 void GPU::Execute(const Service::GSP::Command& command) {
+    if (impl->command_queue) {
+        impl->command_queue->QueueCommand(command);
+        return;
+    }
+    ExecuteCommand(command);
+}
+
+void GPU::WaitForGPU() {
+    if (!impl->command_queue || impl->command_queue->IsProcessorThread()) {
+        return;
+    }
+
+    impl->command_queue->WaitForIdle();
+    DrainInterrupts(0, 0);
+}
+
+void GPU::ExecuteCommand(const Service::GSP::Command& command) {
     using Service::GSP::CommandId;
     auto& regs = impl->pica.regs;
 
@@ -121,7 +175,7 @@ void GPU::Execute(const Service::GSP::Command& command) {
         const auto process = impl->system.Kernel().GetCurrentProcess();
         impl->memory.CopyBlock(*process, command.dma_request.dest_address,
                                command.dma_request.source_address, command.dma_request.size);
-        impl->signal_interrupt(Service::GSP::InterruptId::DMA);
+        PushInterrupt(Service::GSP::InterruptId::DMA);
         break;
     }
     case CommandId::SubmitCmdList: {
@@ -241,6 +295,8 @@ void GPU::SetColorFill(const Pica::ColorFill& fill) {
 }
 
 u32 GPU::ReadReg(VAddr addr) {
+    WaitForGPU();
+
     switch (addr & 0xFFFFF000) {
     case VADDR_LCD: {
         const u32 offset = addr - VADDR_LCD;
@@ -263,6 +319,8 @@ u32 GPU::ReadReg(VAddr addr) {
 }
 
 void GPU::WriteReg(VAddr addr, u32 data) {
+    WaitForGPU();
+
     switch (addr & 0xFFFFF000) {
     case VADDR_LCD: {
         const u32 offset = addr - VADDR_LCD;
@@ -309,6 +367,7 @@ void GPU::WriteReg(VAddr addr, u32 data) {
 }
 
 void GPU::Sync() {
+    WaitForGPU();
     impl->renderer->Sync();
 }
 
@@ -330,6 +389,41 @@ Pica::DebugContext& GPU::DebugContext() {
 
 GraphicsDebugger& GPU::Debugger() {
     return impl->gpu_debugger;
+}
+
+void GPU::PushInterrupt(Service::GSP::InterruptId interrupt_id) {
+    if (!impl->command_queue || !impl->command_queue->IsProcessorThread()) {
+        if (impl->signal_interrupt) {
+            impl->signal_interrupt(interrupt_id);
+        }
+        return;
+    }
+
+    {
+        std::lock_guard lock(impl->interrupt_mutex);
+        impl->pending_interrupts.push(interrupt_id);
+    }
+}
+
+void GPU::DrainInterrupts(uintptr_t user_data, s64 cycles_late) {
+    std::queue<Service::GSP::InterruptId> interrupts;
+    {
+        std::lock_guard lock(impl->interrupt_mutex);
+        std::swap(interrupts, impl->pending_interrupts);
+    }
+
+    while (!interrupts.empty()) {
+        if (impl->signal_interrupt) {
+            impl->signal_interrupt(interrupts.front());
+        }
+        interrupts.pop();
+    }
+
+    if (user_data != 0 && impl->command_queue) {
+        const s64 ticks_until_next_check =
+            cycles_late >= GPU_INTERRUPT_CHECK_TICKS ? 1 : GPU_INTERRUPT_CHECK_TICKS - cycles_late;
+        impl->timing.ScheduleEvent(ticks_until_next_check, impl->interrupt_drain_event, user_data);
+    }
 }
 
 void GPU::SubmitCmdList(u32 index) {
@@ -364,9 +458,9 @@ void GPU::MemoryFill(u32 index) {
     // TODO: hwtest this
     if (config.GetStartAddress() != 0) {
         if (!index) {
-            impl->signal_interrupt(Service::GSP::InterruptId::PSC0);
+            PushInterrupt(Service::GSP::InterruptId::PSC0);
         } else {
-            impl->signal_interrupt(Service::GSP::InterruptId::PSC1);
+            PushInterrupt(Service::GSP::InterruptId::PSC1);
         }
     }
 
@@ -403,16 +497,18 @@ void GPU::MemoryTransfer() {
 
     // Complete transfer.
     config.trigger.Assign(0);
-    impl->signal_interrupt(Service::GSP::InterruptId::PPF);
+    PushInterrupt(Service::GSP::InterruptId::PPF);
 }
 
 void GPU::VBlankCallback(std::uintptr_t user_data, s64 cycles_late) {
+    WaitForGPU();
+
     // Present renderered frame.
     impl->renderer->SwapBuffers();
 
     // Signal to GSP that GPU interrupt has occurred
-    impl->signal_interrupt(Service::GSP::InterruptId::PDC0);
-    impl->signal_interrupt(Service::GSP::InterruptId::PDC1);
+    PushInterrupt(Service::GSP::InterruptId::PDC0);
+    PushInterrupt(Service::GSP::InterruptId::PDC1);
 
     // Reschedule recurrent event
     impl->timing.ScheduleEvent(FRAME_TICKS - cycles_late, impl->vblank_event);

@@ -231,6 +231,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="toggle_async_gpu">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Process GSP GPU commands on a dedicated worker thread. Improves CPU/GPU overlap for OpenGL and Software rendering, but remains disabled internally for Vulkan.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Enable Async GPU</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

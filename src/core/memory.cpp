@@ -276,6 +276,8 @@ public:
     }
 
     void RasterizerFlushVirtualRegion(VAddr start, u32 size, FlushMode mode) {
+        system.GPU().WaitForGPU();
+
         const VAddr end = start + size;
 
         auto CheckRegion = [&](VAddr region_start, VAddr region_end, PAddr paddr_region_start) {
