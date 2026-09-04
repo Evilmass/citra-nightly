@@ -104,6 +104,7 @@
       <string>Load State</string>
      </property>
      <addaction name="action_Load_from_Newest_Slot"/>
+     <addaction name="action_Load_from_Second_Newest_Slot"/>
      <addaction name="separator"/>
     </widget>
     <addaction name="action_Pause"/>
@@ -323,6 +324,11 @@
   <action name="action_Load_from_Newest_Slot">
    <property name="text">
     <string>Load from Newest Slot</string>
+   </property>
+  </action>
+  <action name="action_Load_from_Second_Newest_Slot">
+   <property name="text">
+    <string>Load from Second Newest Slot</string>
    </property>
   </action>
   <action name="action_Configure">

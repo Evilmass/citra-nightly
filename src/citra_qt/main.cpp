@@ -546,6 +546,12 @@ void GMainWindow::InitializeSaveStateMenuActions() {
             actions_load_state[newest_slot - 1]->trigger();
         }
     });
+    connect(ui->action_Load_from_Second_Newest_Slot, &QAction::triggered, this, [this] {
+        UpdateSaveStates();
+        if (second_newest_slot != 0) {
+            actions_load_state[second_newest_slot - 1]->trigger();
+        }
+    });
     connect(ui->action_Save_to_Oldest_Slot, &QAction::triggered, this, [this] {
         UpdateSaveStates();
         actions_save_state[oldest_slot - 1]->trigger();
@@ -593,6 +599,8 @@ void GMainWindow::InitializeHotkeys() {
                          QStringLiteral("Toggle Frame Advancing"));
     link_action_shortcut(ui->action_Advance_Frame, QStringLiteral("Advance Frame"));
     link_action_shortcut(ui->action_Load_from_Newest_Slot, QStringLiteral("Load from Newest Slot"));
+    link_action_shortcut(ui->action_Load_from_Second_Newest_Slot,
+                         QStringLiteral("Load from Second Newest Slot"));
     link_action_shortcut(ui->action_Save_to_Oldest_Slot, QStringLiteral("Save to Oldest Slot"));
 
     const auto add_secondary_window_hotkey = [this](QKeySequence hotkey, const char* slot) {
@@ -1417,10 +1425,12 @@ void GMainWindow::UpdateSaveStates() {
     ui->menu_Load_State->setEnabled(true);
     ui->menu_Save_State->setEnabled(true);
     ui->action_Load_from_Newest_Slot->setEnabled(false);
+    ui->action_Load_from_Second_Newest_Slot->setEnabled(false);
 
-    oldest_slot = newest_slot = 0;
+    oldest_slot = newest_slot = second_newest_slot = 0;
     oldest_slot_time = std::numeric_limits<u64>::max();
     newest_slot_time = 0;
+    second_newest_slot_time = 0;
 
     u64 title_id;
     if (system.GetAppLoader().ReadProgramId(title_id) != Loader::ResultStatus::Success) {
@@ -1451,13 +1461,21 @@ void GMainWindow::UpdateSaveStates() {
         ui->action_Load_from_Newest_Slot->setEnabled(true);
 
         if (savestate.time > newest_slot_time) {
+            second_newest_slot = newest_slot;
+            second_newest_slot_time = newest_slot_time;
             newest_slot = savestate.slot;
             newest_slot_time = savestate.time;
+        } else if (savestate.time > second_newest_slot_time) {
+            second_newest_slot = savestate.slot;
+            second_newest_slot_time = savestate.time;
         }
         if (savestate.time < oldest_slot_time) {
             oldest_slot = savestate.slot;
             oldest_slot_time = savestate.time;
         }
+    }
+    if (second_newest_slot != 0) {
+        ui->action_Load_from_Second_Newest_Slot->setEnabled(true);
     }
     for (u32 i = 0; i < Core::SaveStateSlotCount; ++i) {
         if (!actions_load_state[i]->isEnabled()) {

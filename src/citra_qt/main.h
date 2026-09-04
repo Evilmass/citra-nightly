@@ -357,6 +357,8 @@ private:
     u64 oldest_slot_time;
     u32 newest_slot;
     u64 newest_slot_time;
+    u32 second_newest_slot;
+    u64 second_newest_slot_time;
 
     QTranslator translator;
 
