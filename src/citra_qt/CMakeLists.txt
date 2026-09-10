@@ -134,6 +134,8 @@ add_executable(citra-qt
     game_list_p.h
     game_list_worker.cpp
     game_list_worker.h
+    global_hotkeys.cpp
+    global_hotkeys.h
     hotkeys.cpp
     hotkeys.h
     loading_screen.cpp

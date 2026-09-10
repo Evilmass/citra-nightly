@@ -13,6 +13,8 @@
 
 constexpr int name_column = 0;
 constexpr int hotkey_column = 1;
+constexpr int global_column = 2;
+constexpr int controller_column = 3;
 
 ConfigureHotkeys::ConfigureHotkeys(QWidget* parent)
     : QWidget(parent), ui(std::make_unique<Ui::ConfigureHotkeys>()) {
@@ -20,8 +22,8 @@ ConfigureHotkeys::ConfigureHotkeys(QWidget* parent)
     setFocusPolicy(Qt::ClickFocus);
 
     model = new QStandardItemModel(this);
-    model->setColumnCount(2);
-    model->setHorizontalHeaderLabels({tr("Action"), tr("Hotkey")});
+    model->setColumnCount(4);
+    model->setHorizontalHeaderLabels({tr("Action"), tr("Hotkey"), tr("Global"), tr("Controller")});
 
     connect(ui->hotkey_list, &QTreeView::doubleClicked, this, &ConfigureHotkeys::Configure);
     connect(ui->hotkey_list, &QTreeView::customContextMenuRequested, this,
@@ -29,8 +31,10 @@ ConfigureHotkeys::ConfigureHotkeys(QWidget* parent)
     ui->hotkey_list->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->hotkey_list->setModel(model);
 
+    ui->hotkey_list->setColumnHidden(controller_column, true);
     ui->hotkey_list->setColumnWidth(0, 250);
     ui->hotkey_list->resizeColumnToContents(hotkey_column);
+    ui->hotkey_list->resizeColumnToContents(global_column);
 
     connect(ui->button_restore_defaults, &QPushButton::clicked, this,
             &ConfigureHotkeys::RestoreDefaults);
@@ -63,11 +67,15 @@ void ConfigureHotkeys::Populate(const HotkeyRegistry& registry) {
             QStandardItem* action = new QStandardItem(hotkey.first);
             QStandardItem* keyseq =
                 new QStandardItem(hotkey.second.keyseq.toString(QKeySequence::NativeText));
+            QStandardItem* global_item = new QStandardItem();
             QStandardItem* controller_keyseq = new QStandardItem(hotkey.second.controller_keyseq);
             action->setEditable(false);
             keyseq->setEditable(false);
+            global_item->setEditable(false);
+            global_item->setCheckable(true);
+            global_item->setCheckState(hotkey.second.global ? Qt::Checked : Qt::Unchecked);
             controller_keyseq->setEditable(false);
-            parent_item->appendRow({action, keyseq, controller_keyseq});
+            parent_item->appendRow({action, keyseq, global_item, controller_keyseq});
         }
         model->appendRow(parent_item);
     }
@@ -140,6 +148,7 @@ void ConfigureHotkeys::ApplyConfiguration(HotkeyRegistry& registry) {
         for (int key_column_id = 0; key_column_id < parent->rowCount(); key_column_id++) {
             const QStandardItem* action = parent->child(key_column_id, name_column);
             const QStandardItem* keyseq = parent->child(key_column_id, hotkey_column);
+            const QStandardItem* global_item = parent->child(key_column_id, global_column);
             for (auto& [group, sub_actions] : registry.hotkey_groups) {
                 if (group != parent->text())
                     continue;
@@ -147,6 +156,7 @@ void ConfigureHotkeys::ApplyConfiguration(HotkeyRegistry& registry) {
                     if (action_name != action->text())
                         continue;
                     hotkey.keyseq = QKeySequence(keyseq->text());
+                    hotkey.global = global_item->checkState() == Qt::Checked;
                 }
             }
         }
@@ -163,6 +173,10 @@ void ConfigureHotkeys::RestoreDefaults() {
             model->item(r, 0)
                 ->child(r2, hotkey_column)
                 ->setText(Config::default_hotkeys[r2].shortcut.keyseq);
+            model->item(r, 0)
+                ->child(r2, global_column)
+                ->setCheckState(Config::default_hotkeys[r2].shortcut.global ? Qt::Checked
+                                                                            : Qt::Unchecked);
         }
     }
 }
@@ -173,6 +187,7 @@ void ConfigureHotkeys::ClearAll() {
 
         for (int r2 = 0; r2 < parent->rowCount(); ++r2) {
             model->item(r, 0)->child(r2, hotkey_column)->setText(QString{});
+            model->item(r, 0)->child(r2, global_column)->setCheckState(Qt::Unchecked);
         }
     }
 }
@@ -190,8 +205,11 @@ void ConfigureHotkeys::PopupContextMenu(const QPoint& menu_location) {
     const auto hotkey_index = index.sibling(index.row(), hotkey_column);
     connect(restore_default, &QAction::triggered, this,
             [this, hotkey_index] { RestoreHotkey(hotkey_index); });
-    connect(clear, &QAction::triggered, this,
-            [this, hotkey_index] { model->setData(hotkey_index, QString{}); });
+    connect(clear, &QAction::triggered, this, [this, hotkey_index] {
+        model->setData(hotkey_index, QString{});
+        model->setData(hotkey_index.sibling(hotkey_index.row(), global_column), Qt::Unchecked,
+                       Qt::CheckStateRole);
+    });
 
     context_menu.exec(ui->hotkey_list->viewport()->mapToGlobal(menu_location));
 }
@@ -207,6 +225,10 @@ void ConfigureHotkeys::RestoreHotkey(QModelIndex index) {
             tr("The default key sequence is already assigned to: %1").arg(used_action));
     } else {
         model->setData(index, default_key_sequence.toString(QKeySequence::NativeText));
+        model->setData(index.sibling(index.row(), global_column),
+                       Config::default_hotkeys[index.row()].shortcut.global ? Qt::Checked
+                                                                            : Qt::Unchecked,
+                       Qt::CheckStateRole);
     }
 }
 

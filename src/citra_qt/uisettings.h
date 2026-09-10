@@ -20,6 +20,7 @@ namespace UISettings {
 struct ContextualShortcut {
     QString keyseq;
     int context;
+    bool global = false;
 };
 
 struct Shortcut {

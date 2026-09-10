@@ -5,6 +5,8 @@
 #pragma once
 
 #include <array>
+#include <functional>
+#include <map>
 #include <memory>
 #include <vector>
 #include <QMainWindow>
@@ -13,6 +15,7 @@
 #include <QTimer>
 #include <QTranslator>
 #include "citra_qt/compatibility_list.h"
+#include "citra_qt/global_hotkeys.h"
 #include "citra_qt/hotkeys.h"
 #include "core/core.h"
 #include "core/savestate.h"
@@ -366,6 +369,11 @@ private:
     QStringList default_theme_paths;
 
     HotkeyRegistry hotkey_registry;
+
+    // System-wide (global) hotkeys, which trigger even when the window is not focused.
+    GlobalHotkeys global_hotkeys;
+    // Maps a hotkey name to the function it triggers. Used to dispatch global hotkeys.
+    std::map<QString, std::function<void()>> hotkey_dispatch;
 
     std::shared_ptr<Camera::QtMultimediaCameraHandlerFactory> qt_cameras;
 

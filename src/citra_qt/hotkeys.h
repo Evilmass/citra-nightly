@@ -67,12 +67,22 @@ public:
      */
     Qt::ShortcutContext GetShortcutContext(const QString& group, const QString& action);
 
+    /**
+     * Returns whether the hotkey is registered as a system-wide (global) hotkey, i.e. it
+     * triggers even when the application is not focused.
+     *
+     * @param group  General group this hotkey belongs to (e.g. "Main Window", "Debugger").
+     * @param action Name of the action (e.g. "Start Emulation", "Load Image").
+     */
+    bool IsGlobal(const QString& group, const QString& action) const;
+
 private:
     struct Hotkey {
         QKeySequence keyseq;
         QString controller_keyseq;
         QShortcut* shortcut = nullptr;
         Qt::ShortcutContext context = Qt::WindowShortcut;
+        bool global = false;
     };
 
     using HotkeyMap = std::map<QString, Hotkey>;

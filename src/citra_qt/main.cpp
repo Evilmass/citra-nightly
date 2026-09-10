@@ -52,6 +52,7 @@
 #include "citra_qt/discord.h"
 #include "citra_qt/dumping/dumping_dialog.h"
 #include "citra_qt/game_list.h"
+#include "citra_qt/global_hotkeys.h"
 #include "citra_qt/hotkeys.h"
 #include "citra_qt/loading_screen.h"
 #include "citra_qt/main.h"
@@ -213,6 +214,15 @@ GMainWindow::GMainWindow(Core::System& system_)
     InitializeDebugWidgets();
     InitializeRecentFileMenuActions();
     InitializeSaveStateMenuActions();
+
+    // Global hotkeys fire even when the application is not focused.
+    connect(&global_hotkeys, &GlobalHotkeys::Activated, this, [this](const QString& name) {
+        const auto it = hotkey_dispatch.find(name);
+        if (it != hotkey_dispatch.end()) {
+            it->second();
+        }
+    });
+
     InitializeHotkeys();
 #if ENABLE_QT_UPDATER
     ShowUpdaterWidgets();
@@ -567,6 +577,8 @@ void GMainWindow::InitializeSaveStateMenuActions() {
 
 void GMainWindow::InitializeHotkeys() {
     hotkey_registry.LoadHotkeys();
+    global_hotkeys.UnregisterAll();
+    hotkey_dispatch.clear();
 
     const QString main_window = QStringLiteral("Main Window");
     const QString fullscreen = QStringLiteral("Fullscreen");
@@ -574,11 +586,33 @@ void GMainWindow::InitializeHotkeys() {
     const QString swap_screens = QStringLiteral("Swap Screens");
     const QString rotate_screens = QStringLiteral("Rotate Screens Upright");
 
+    // Registers a system-wide hotkey for the action. Returns true if the action is handled
+    // globally, false if it should use a regular Qt shortcut instead (either because it isn't
+    // marked as global, or because the OS registration failed).
+    const auto try_register_global = [&](const QString& action_name) {
+        if (!hotkey_registry.IsGlobal(main_window, action_name)) {
+            return false;
+        }
+        if (global_hotkeys.Register(action_name,
+                                    hotkey_registry.GetKeySequence(main_window, action_name))) {
+            return true;
+        }
+        LOG_WARNING(Frontend,
+                    "Global hotkey '{}' could not be registered, falling back to a window "
+                    "shortcut",
+                    action_name.toStdString());
+        return false;
+    };
+
     const auto link_action_shortcut = [&](QAction* action, const QString& action_name) {
         static const QString main_window = QStringLiteral("Main Window");
+        action->setAutoRepeat(false);
+        hotkey_dispatch.emplace(action_name, [action] { action->trigger(); });
+        if (try_register_global(action_name)) {
+            return;
+        }
         action->setShortcut(hotkey_registry.GetKeySequence(main_window, action_name));
         action->setShortcutContext(hotkey_registry.GetShortcutContext(main_window, action_name));
-        action->setAutoRepeat(false);
         this->addAction(action);
     };
 
@@ -612,27 +646,44 @@ void GMainWindow::InitializeHotkeys() {
         secondary_window->addAction(secondary_window_action);
     };
 
-    // Use the same fullscreen hotkey as the main window
+    // Use the same fullscreen hotkey as the main window, unless it's handled globally (in which
+    // case the secondary window action would fire twice).
     const auto fullscreen_hotkey = hotkey_registry.GetKeySequence(main_window, fullscreen);
-    add_secondary_window_hotkey(fullscreen_hotkey, SLOT(ToggleSecondaryFullscreen()));
+    if (!hotkey_registry.IsGlobal(main_window, fullscreen)) {
+        add_secondary_window_hotkey(fullscreen_hotkey, SLOT(ToggleSecondaryFullscreen()));
+    }
 
     const auto toggle_screen_hotkey =
         hotkey_registry.GetKeySequence(main_window, toggle_screen_layout);
-    add_secondary_window_hotkey(toggle_screen_hotkey, SLOT(ToggleScreenLayout()));
+    if (!hotkey_registry.IsGlobal(main_window, toggle_screen_layout)) {
+        add_secondary_window_hotkey(toggle_screen_hotkey, SLOT(ToggleScreenLayout()));
+    }
 
     const auto swap_screen_hotkey = hotkey_registry.GetKeySequence(main_window, swap_screens);
-    add_secondary_window_hotkey(swap_screen_hotkey, SLOT(TriggerSwapScreens()));
+    if (!hotkey_registry.IsGlobal(main_window, swap_screens)) {
+        add_secondary_window_hotkey(swap_screen_hotkey, SLOT(TriggerSwapScreens()));
+    }
 
     const auto rotate_screen_hotkey = hotkey_registry.GetKeySequence(main_window, rotate_screens);
-    add_secondary_window_hotkey(rotate_screen_hotkey, SLOT(TriggerRotateScreens()));
+    if (!hotkey_registry.IsGlobal(main_window, rotate_screens)) {
+        add_secondary_window_hotkey(rotate_screen_hotkey, SLOT(TriggerRotateScreens()));
+    }
 
     const auto connect_shortcut = [&](const QString& action_name, const auto& function) {
+        hotkey_dispatch.emplace(action_name, function);
+        if (try_register_global(action_name)) {
+            return;
+        }
         const auto* hotkey = hotkey_registry.GetHotkey(main_window, action_name, this);
         connect(hotkey, &QShortcut::activated, this, function);
     };
 
-    connect(hotkey_registry.GetHotkey(main_window, toggle_screen_layout, render_window),
-            &QShortcut::activated, this, &GMainWindow::ToggleScreenLayout);
+    // "Toggle Screen Layout" has no menu action and is handled by the render window.
+    hotkey_dispatch.emplace(toggle_screen_layout, [this] { ToggleScreenLayout(); });
+    if (!try_register_global(toggle_screen_layout)) {
+        connect(hotkey_registry.GetHotkey(main_window, toggle_screen_layout, render_window),
+                &QShortcut::activated, this, &GMainWindow::ToggleScreenLayout);
+    }
 
     connect_shortcut(QStringLiteral("Exit Fullscreen"), [&] {
         if (emulation_running) {

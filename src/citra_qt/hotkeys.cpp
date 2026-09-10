@@ -18,7 +18,8 @@ void HotkeyRegistry::SaveHotkeys() {
             UISettings::values.shortcuts.push_back(
                 {hotkey.first, group.first,
                  UISettings::ContextualShortcut(
-                     {hotkey.second.keyseq.toString(), hotkey.second.context})});
+                     {hotkey.second.keyseq.toString(), hotkey.second.context,
+                      hotkey.second.global})});
         }
     }
 }
@@ -33,6 +34,7 @@ void HotkeyRegistry::LoadHotkeys() {
                 QKeySequence::fromString(shortcut.shortcut.keyseq, QKeySequence::NativeText);
             hk.context = static_cast<Qt::ShortcutContext>(shortcut.shortcut.context);
         }
+        hk.global = shortcut.shortcut.global;
         if (hk.shortcut) {
             hk.shortcut->disconnect();
             hk.shortcut->setKey(hk.keyseq);
@@ -59,4 +61,13 @@ Qt::ShortcutContext HotkeyRegistry::GetShortcutContext(const QString& group,
                                                        const QString& action) {
     Hotkey& hk = hotkey_groups[group][action];
     return hk.context;
+}
+
+bool HotkeyRegistry::IsGlobal(const QString& group, const QString& action) const {
+    const auto group_it = hotkey_groups.find(group);
+    if (group_it == hotkey_groups.end()) {
+        return false;
+    }
+    const auto hotkey_it = group_it->second.find(action);
+    return hotkey_it != group_it->second.end() && hotkey_it->second.global;
 }
