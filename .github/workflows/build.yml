@@ -36,7 +36,10 @@ jobs:
           name: source
           path: artifacts/
   windows:
-    runs-on: windows-latest
+    # windows-latest now points at the VS 2026 image (MSVC 14.51), whose STL removed
+    # stdext::make_checked_array_iterator used by the pinned Crypto++ 8.7 (integer.cpp).
+    # Stay on the VS 2022 image (MSVC 14.44) until Crypto++ is patched.
+    runs-on: windows-2022
     strategy:
       matrix:
         target: ["msvc"]
